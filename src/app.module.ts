@@ -7,8 +7,6 @@ import { CategoryModule } from './modules/category/category.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { User } from './modules/users/entities/user.entity';
 
 @Module({
   imports: [
@@ -26,8 +24,8 @@ import { User } from './modules/users/entities/user.entity';
       username: 'user',
       password: 'a',
       database: 'prjdb',
-      entities: [User],
       synchronize: true,
+      autoLoadEntities: true,
     }),
   ],
   controllers: [AppController],

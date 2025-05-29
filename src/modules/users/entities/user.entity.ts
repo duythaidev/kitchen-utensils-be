@@ -6,12 +6,15 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    firstName: string;
+    @Column({ unique: true })
+    email: string;
 
     @Column()
-    lastName: string;
+    password: string;
 
-    @Column({ default: true })
-    isActive: boolean;
+    @Column({ nullable: true })
+    user_name: string;
+
+    @Column({ nullable: true })
+    age: number;
 }
