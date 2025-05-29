@@ -1,13 +1,37 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { ProductsModule } from './products/products.module';
-import { CategoryModule } from './category/category.module';
+import { UsersModule } from './modules/users/users.module';
+import { ProductsModule } from './modules/products/products.module';
+import { CategoryModule } from './modules/category/category.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { User } from './modules/users/entities/user.entity';
 
 @Module({
-  imports: [UsersModule, ProductsModule, CategoryModule],
+  imports: [
+    UsersModule,
+    ProductsModule,
+    CategoryModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'user',
+      password: 'a',
+      database: 'prjdb',
+      entities: [User],
+      synchronize: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}
