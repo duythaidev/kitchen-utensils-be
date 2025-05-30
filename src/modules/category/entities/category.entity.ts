@@ -1,11 +1,12 @@
 import { Product } from "src/modules/products/entities/product.entity";
-import { PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, Entity } from "typeorm";
 
+@Entity()
 export class Category {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
     category_name: string;
 
     @OneToMany(() => Product, product => product.category)

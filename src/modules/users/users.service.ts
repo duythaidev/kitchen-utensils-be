@@ -12,12 +12,12 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) { }
 
-  create(createUserDto: CreateUserDto) {
-    const isExist = this.usersRepository.findOne({ where: { email: createUserDto.email } })
+  async create(createUserDto: CreateUserDto) {
+    const isExist = await this.usersRepository.findOne({ where: { email: createUserDto.email } })
     if (isExist !== null) {
-      throw new BadRequestException('This is email exist');
+      throw new BadRequestException('Email exist');
     }
-    return this.usersRepository.save({ email: 'a', password: 'a' });
+    return this.usersRepository.save(createUserDto);
   }
 
   findAll() {
@@ -25,14 +25,22 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.usersRepository.findOne({ where: { id } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.usersRepository.update(
+      { id },
+      { ...updateUserDto }
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.usersRepository.delete({ id });
   }
+
+  ban(id: number, is_active: boolean) {
+    return this.usersRepository.update({ id }, { is_active });
+  }
+
 }

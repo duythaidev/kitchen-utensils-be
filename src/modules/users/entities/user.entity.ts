@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, Column, Entity } from "typeorm";
+import { PrimaryGeneratedColumn, Column, Entity, UpdateDateColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -9,12 +9,24 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @Column()
+    @Column({select: false})
     password: string;
 
     @Column({ nullable: true })
-    user_name: string;
+    user_name?: string;
 
     @Column({ nullable: true })
-    age: number;
+    age?: number;
+
+    @Column({ default:true })
+    is_active: boolean;
+
+    
+
+    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    public created_at: Date;
+
+    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    public updated_at: Date;
+
 }

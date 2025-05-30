@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
+    transformOptions: { enableImplicitConversion: true },
   }));
 
   app.setGlobalPrefix('api/v1');
