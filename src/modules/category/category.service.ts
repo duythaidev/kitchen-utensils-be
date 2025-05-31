@@ -12,14 +12,10 @@ export class CategoryService {
     private categoryRepository: Repository<Category>,
   ) { }
 
-  create(createCategoryDto: CreateCategoryDto) {
-    const isExist = this.categoryRepository.findOne({
-      where: {
-        category_name: createCategoryDto.category_name,
-      },
-    });
+  async create(createCategoryDto: CreateCategoryDto) {
+    const isExist = await this.categoryRepository.findOne({ where: { category_name: createCategoryDto.category_name, }, });
 
-    if (isExist === null) {
+    if (isExist !== null) {
       throw new BadRequestException('Category already exists');
     }
 

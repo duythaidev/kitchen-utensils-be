@@ -1,4 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity, UpdateDateColumn, CreateDateColumn } from "typeorm";
+import { Cart } from "src/modules/carts/entities/cart.entity";
+import { PrimaryGeneratedColumn, Column, Entity, UpdateDateColumn, CreateDateColumn, JoinColumn, OneToOne } from "typeorm";
 
 @Entity()
 export class User {
@@ -9,7 +10,7 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @Column({select: false})
+    @Column({ select: false })
     password: string;
 
     @Column({ nullable: true })
@@ -18,10 +19,10 @@ export class User {
     @Column({ nullable: true })
     age?: number;
 
-    @Column({ default:true })
+    @Column({ default: true })
     is_active: boolean;
 
-    
+
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     public created_at: Date;

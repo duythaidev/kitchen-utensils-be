@@ -7,26 +7,21 @@ import { CategoryModule } from './modules/category/category.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { CartsModule } from './modules/carts/carts.module';
+import { CartDetailsModule } from './modules/cart_details/cart_details.module';
+import { ormconfig } from './config/ormconfig';
 @Module({
   imports: [
     UsersModule,
     ProductsModule,
     CategoryModule,
+    CartsModule,
+    CartDetailsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'user',
-      password: 'a',
-      database: 'prjdb',
-      synchronize: true,
-      autoLoadEntities: true,
-    }),
+    TypeOrmModule.forRoot(ormconfig),
   ],
   controllers: [AppController],
   providers: [AppService],
