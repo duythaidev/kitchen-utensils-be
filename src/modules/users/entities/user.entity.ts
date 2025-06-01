@@ -22,7 +22,11 @@ export class User {
     @Column({ default: true })
     is_active: boolean;
 
-
+    @Column({
+        nullable: true,
+        type: "longblob",
+    })
+    avatar?: Buffer
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     public created_at: Date;

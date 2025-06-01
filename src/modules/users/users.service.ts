@@ -24,9 +24,21 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return this.usersRepository.findOne({ where: { id } });
+  async findOne(id: number) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (user && user.avatar) {
+      const buffer = Buffer.from(user.avatar.buffer);
+      const base64String = buffer.toString('base64');
+      return {
+        id: user.id,
+        email: user.email,
+        is_active: user.is_active,
+        avatar: base64String
+      }
+    }
+    return user
   }
+
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.usersRepository.update(
