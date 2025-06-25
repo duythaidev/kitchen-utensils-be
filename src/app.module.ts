@@ -11,6 +11,9 @@ import { CartsModule } from './modules/carts/carts.module';
 import { CartDetailsModule } from './modules/cart_details/cart_details.module';
 import { ormconfig } from './config/ormconfig';
 import { AuthModule } from './modules/auth/auth.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { OrderDetailsModule } from './modules/order-details/order-details.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -25,7 +28,9 @@ import { AuthModule } from './modules/auth/auth.module';
     CartsModule,
     CartDetailsModule,
     AuthModule,
-
+    OrdersModule,
+    OrderDetailsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

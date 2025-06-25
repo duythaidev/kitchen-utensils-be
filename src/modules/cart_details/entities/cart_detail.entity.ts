@@ -6,6 +6,9 @@ export class CartDetail {
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column()
+    product_id: number
+
     @ManyToOne(() => Product, (product) => product.id)
     @JoinColumn({ name: 'product_id' })
     product: Product

@@ -23,11 +23,11 @@ export class UpdateUserDto {
     @IsOptional()
     user_name: string
 
-    @IsInt()
-    @Min(0)
     @IsOptional()
-    age: number
-    
+    avatar_url?: string;
+
+    @IsString()
+    @MaxLength(100)
     @IsOptional()
-    avatar: Buffer
+    address: string;
 }

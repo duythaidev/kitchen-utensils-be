@@ -16,17 +16,20 @@ export class User {
     @Column({ nullable: true })
     user_name?: string;
 
-    @Column({ nullable: true })
-    age?: number;
-
     @Column({ default: true })
     is_active: boolean;
 
-    @Column({
-        nullable: true,
-        type: "longblob",
-    })
-    avatar?: Buffer
+    @Column({ nullable: true })
+    address?: string;
+
+    // @Column({
+    //     nullable: true,
+    //     type: "longblob",
+    // })
+    // avatar?: Buffer
+
+    @Column({ nullable: true })
+    avatar_url?: string;
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     public created_at: Date;

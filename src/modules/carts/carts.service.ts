@@ -4,10 +4,8 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
-import { User } from '../users/entities/user.entity';
-import { CartDetail } from '../cart_details/entities/cart_detail.entity';
-import { Product } from '../products/entities/product.entity';
 import { CartDetailsService } from '../cart_details/cart_details.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CartsService {
@@ -15,15 +13,8 @@ export class CartsService {
   constructor(
     @InjectRepository(Cart)
     private cartsRepository: Repository<Cart>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    @InjectRepository(CartDetail)
-    private cartDetailsRepository: Repository<CartDetail>,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
+    private readonly usersService: UsersService,
     private readonly cartDetailsService: CartDetailsService
-
-
   ) { }
 
   async create(user_id: number) {
@@ -32,7 +23,7 @@ export class CartsService {
     if (cart) {
       throw new BadRequestException('Cart already exits')
     }
-    const user = await this.usersRepository.findOne({ where: { id: user_id } });
+    const user = await this.usersService.findOne(user_id);
     if (!user) {
       throw new BadRequestException('Not found user')
     }
@@ -70,5 +61,13 @@ export class CartsService {
   removeFromCart(updateCartDto: UpdateCartDto) {
 
     return `This action updates a #${updateCartDto.product_id} cart`;
+  } 
+
+  async checkOut(user_id: number, address:string) {
+    const cart = await this.cartsRepository.findOne({ where: { id: user_id } });
+    if (!cart) {
+      throw new BadRequestException('Cart not found');
+    }
+    return this.cartDetailsService.clearCart(cart, address);
   }
 }

@@ -1,4 +1,3 @@
-import { CartDetail } from "src/modules/cart_details/entities/cart_detail.entity";
 import { Category } from "src/modules/category/entities/category.entity";
 import { PrimaryGeneratedColumn, Column, ManyToOne, Entity, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
 
