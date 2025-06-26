@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductImagesModule } from './modules/product-images/product-images.module';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CartsModule } from './modules/carts/carts.module';
@@ -27,10 +28,11 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     CategoryModule,
     CartsModule,
     CartDetailsModule,
-    AuthModule,
     OrdersModule,
+    AuthModule,
     OrderDetailsModule,
     ReviewsModule,
+    ProductImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

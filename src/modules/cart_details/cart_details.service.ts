@@ -13,6 +13,7 @@ import { PricingService } from '../pricing/pricing.service';
 @Injectable()
 export class CartDetailsService {
 
+
   constructor(
     @InjectRepository(CartDetail)
     private cartDetailsRepository: Repository<CartDetail>,
@@ -24,7 +25,7 @@ export class CartDetailsService {
   ) { }
 
   async clearCart(cart: Cart, address: string) {
-    const cartItems = await this.cartDetailsRepository.find({ where: { cart: { id: cart.id } } });
+    const cartItems = await this.cartDetailsRepository.find({ where: { cart_id: cart.id } });
     // console.log(cartItems.forEach(item => console.log(item.)));
     const total_price = this.pricingService.calculateTotalVAT(cartItems);
     const createOrderDto: CreateOrderDto = {
@@ -51,10 +52,19 @@ export class CartDetailsService {
     return `This action returns all cartDetails`;
   }
 
+  getProductsInCart(cart_id: number) {
+    return this.cartDetailsRepository.find({ where: { cart_id } })
+  }
+
   async addProductToCart(cart: Cart, product_id: number, quantity: number) {
     const product = await this.productsService.findOne(product_id);
     if (!product) {
       throw new BadRequestException('Not found product')
+    }
+    const cartDetail = await this.cartDetailsRepository.findOne({ where: { cart_id: cart.id, product_id } })
+    if (cartDetail) {
+      cartDetail.quantity += quantity
+      return this.cartDetailsRepository.save(cartDetail)
     }
     return this.cartDetailsRepository.save({ cart, quantity: quantity, product })
   }
@@ -68,7 +78,7 @@ export class CartDetailsService {
     return `This action updates a #${id} cartDetail`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cartDetail`;
+  removeProductFromCart(user_id: number, product_id: number) {
+    return this.cartDetailsRepository.delete({ cart: { user_id }, product: { id: product_id } })
   }
 }

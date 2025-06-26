@@ -16,6 +16,9 @@ export class CartDetail {
     @Column({ default: 1 })
     quantity: number
 
+    @Column()
+    cart_id: number
+
     @ManyToOne(() => Cart, cart => cart.cart_detail)
     @JoinColumn({ name: 'cart_id' })
     cart: Cart;

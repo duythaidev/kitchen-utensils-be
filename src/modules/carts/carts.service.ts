@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,10 +14,10 @@ export class CartsService {
     @InjectRepository(Cart)
     private cartsRepository: Repository<Cart>,
     private readonly usersService: UsersService,
-    private readonly cartDetailsService: CartDetailsService
+    private readonly cartDetailsService: CartDetailsService,
   ) { }
 
-  async create(user_id: number) {
+  private async create(user_id: number) {
 
     const cart = await this.findOne(user_id)
     if (cart) {
@@ -38,17 +38,13 @@ export class CartsService {
     return this.cartsRepository.findOne({ where: { id: user_id } });
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
-  }
-
   remove(id: number) {
     return `This action removes a #${id} cart`;
   }
 
   async addToCart(updateCartDto: UpdateCartDto) {
     // Tim cart
-    let cart = await this.cartsRepository.findOne({ where: { id: updateCartDto.user_id } });
+    let cart = await this.findOne(updateCartDto.user_id);
 
     // Ko thay thi tao
     if (!cart) {
@@ -58,12 +54,22 @@ export class CartsService {
     return this.cartDetailsService.addProductToCart(cart, updateCartDto.product_id, updateCartDto.quantity)
   }
 
+  async getProducstInCart(user_id: number) {
+    let cart = await this.findOne(user_id);
+
+    // Ko thay thi tao
+    if (!cart) {
+      cart = await this.create(user_id)
+    }
+    return this.cartDetailsService.getProductsInCart(cart.id)
+  }
+
   removeFromCart(updateCartDto: UpdateCartDto) {
 
-    return `This action updates a #${updateCartDto.product_id} cart`;
-  } 
+    return this.cartDetailsService.removeProductFromCart(updateCartDto.user_id, updateCartDto.product_id)
+  }
 
-  async checkOut(user_id: number, address:string) {
+  async checkOut(user_id: number, address: string) {
     const cart = await this.cartsRepository.findOne({ where: { id: user_id } });
     if (!cart) {
       throw new BadRequestException('Cart not found');

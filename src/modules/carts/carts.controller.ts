@@ -7,10 +7,10 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 export class CartsController {
   constructor(private readonly cartsService: CartsService) { }
 
-  @Post()
-  create(@Body() user_id: number) {
-    return this.cartsService.create(user_id);
-  }
+  // @Post()
+  // create(@Body() user_id: number) {
+  //   return this.cartsService.create(user_id);
+  // }
 
   @Post()
   addToCart(@Body() updateCartDto: UpdateCartDto) {
@@ -22,13 +22,24 @@ export class CartsController {
     return this.cartsService.findAll();
   }
 
+  // @Get(':id')
+  // findOne(@Param('id') user_id: string) {
+  //   return this.cartsService.findOne(+user_id);
+  // }
+
   @Get(':id')
-  findOne(@Param('id') user_id: string) {
-    return this.cartsService.findOne(+user_id);
+  getProductsInCart(@Param('id') user_id: string) {
+    return this.cartsService.getProducstInCart(+user_id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cartsService.remove(+id);
+  }
+
+  @Post('checkout')
+  async checkout(@Body() body: { userId: number; address: string }) {
+    const { userId, address } = body;
+    return this.cartsService.checkOut(userId, address);
   }
 }

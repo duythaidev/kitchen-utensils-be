@@ -7,23 +7,23 @@ import { UpdateCartDetailDto } from './dto/update-cart_detail.dto';
 export class CartDetailsController {
   constructor(private readonly cartDetailsService: CartDetailsService) {}
 
-  @Get()
-  findAll() {
-    return this.cartDetailsService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.cartDetailsService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartDetailsService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.cartDetailsService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDetailDto: UpdateCartDetailDto) {
-    return this.cartDetailsService.update(+id, updateCartDetailDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateCartDetailDto: UpdateCartDetailDto) {
+  //   return this.cartDetailsService.update(+id, updateCartDetailDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartDetailsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.cartDetailsService.removeProductFromCart(+id);
+  // }
 }

@@ -1,5 +1,6 @@
 import { Category } from "src/modules/category/entities/category.entity";
-import { PrimaryGeneratedColumn, Column, ManyToOne, Entity, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
+import { ProductImage } from "src/modules/product-images/entities/product-image.entity";
+import { PrimaryGeneratedColumn, Column, ManyToOne, Entity, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToMany } from "typeorm";
 
 @Entity()
 export class Product {
@@ -24,6 +25,9 @@ export class Product {
     @ManyToOne(() => Category)
     @JoinColumn({ name: 'category_id' })
     category: Category;
+
+    @OneToMany(() => ProductImage, productImage => productImage.product)
+    images: ProductImage[];
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     public created_at: Date;

@@ -1,0 +1,49 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateProductImageDto } from './dto/create-product-image.dto';
+import { UpdateProductImageDto } from './dto/update-product-image.dto';
+import { ProductImage } from './entities/product-image.entity';
+
+@Injectable()
+export class ProductImagesService {
+    constructor(
+        @InjectRepository(ProductImage)
+        private productImageRepository: Repository<ProductImage>,
+    ) { }
+
+    async create(createProductImageDto: CreateProductImageDto) {
+        const productImage = this.productImageRepository.create(createProductImageDto);
+        return await this.productImageRepository.save(productImage);
+    }
+
+    async findAll() {
+        return await this.productImageRepository.find();
+    }
+
+    async findByProductId(product_id: number) {
+        return await this.productImageRepository.find({
+            where: { product_id },
+        });
+    }
+
+    async findOne(id: number) {
+        const productImage = await this.productImageRepository.findOne({
+            where: { id },
+        });
+        if (!productImage) {
+            throw new NotFoundException(`Product image with ID ${id} not found`);
+        }
+        return productImage;
+    }
+
+    // async update(id: number, updateProductImageDto: UpdateProductImageDto) {
+    //     const productImage = await this.findOne(id);
+    //     return await this.productImageRepository.update(productImage, updateProductImageDto);
+    // }
+
+    async remove(id: number) {
+        const productImage = await this.findOne(id);
+        return await this.productImageRepository.remove(productImage);
+    }
+}

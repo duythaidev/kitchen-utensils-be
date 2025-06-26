@@ -1,11 +1,9 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { HttpService } from '@nestjs/axios';
-import axios from 'axios';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +11,6 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private readonly httpService: HttpService,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -21,7 +18,8 @@ export class UsersService {
     if (isExist !== null) {
       throw new BadRequestException('Email exist');
     }
-    return this.usersRepository.save(createUserDto);
+    const user = await this.usersRepository.save(createUserDto);
+    return user;
   }
 
   findAll() {

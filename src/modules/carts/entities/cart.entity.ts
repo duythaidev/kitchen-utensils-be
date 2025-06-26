@@ -7,6 +7,9 @@ export class Cart {
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column({ name: 'user_id' })
+    user_id: number
+
     @OneToOne(() => User, { cascade: true }) // specify inverse side as a second parameter
     @JoinColumn({ name: "user_id" })  // This matches @PrimaryColumn name
     user: User

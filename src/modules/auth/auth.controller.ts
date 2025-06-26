@@ -9,10 +9,14 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  signIn(@Req() req: any, @Res({ passthrough: true }) response: Response) {
-    console.log(req)
-    response.cookie('access-token', 'value')
-    return req.user;
+  async signIn(@Req() req: any, @Res({ passthrough: true }) response: Response) {
+    console.log(req.user)
+    const token = await this.authService.signJWT(req.user)
+    response.cookie('access-token', token)
+    return {
+      access_token: token,
+      user: req.user
+    };
   }
 
   @UseGuards(AuthGuard('local'))
