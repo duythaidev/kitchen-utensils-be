@@ -8,6 +8,7 @@ import { ProductsService } from '../products/products.service';
 import { OrdersService } from '../orders/orders.service';
 import { OrderDetailsService } from '../order-details/order-details.service';
 import { CreateOrderDto } from '../orders/dto/create-order.dto';
+import { PricingService } from '../pricing/pricing.service';
 
 @Injectable()
 export class CartDetailsService {
@@ -18,20 +19,32 @@ export class CartDetailsService {
     private readonly productsService: ProductsService,
     private readonly ordersService: OrdersService,
     private readonly orderDetailsService: OrderDetailsService,
+    private readonly pricingService: PricingService,
 
   ) { }
 
   async clearCart(cart: Cart, address: string) {
     const cartItems = await this.cartDetailsRepository.find({ where: { cart: { id: cart.id } } });
     // console.log(cartItems.forEach(item => console.log(item.)));
-    const total_price = cartItems.reduce((total, curr) => total + (curr.product.price * curr.quantity), 0)
+    const total_price = this.pricingService.calculateTotalVAT(cartItems);
     const createOrderDto: CreateOrderDto = {
       address,
       total_price,
       user_id: cart.user.id
     }
+    // Tạo order
     const newOrder = await this.ordersService.create(createOrderDto)
-    return await this.cartDetailsRepository.remove(cartItems);
+    // Thêm chi tiết đơn hàng vào
+    const cartDetailEntities = await this.orderDetailsService.createMany(cartItems.map((item) => ({
+      order_id: newOrder.id,
+      product_id: item.product.id,
+      quantity: item.quantity,
+      price: item.product.price
+    })));
+
+    // await this.orderDetailsService.createMany(cartDetailEntities);
+    await this.cartDetailsRepository.remove(cartItems)
+    return newOrder;
   }
 
   findAll() {

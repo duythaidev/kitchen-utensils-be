@@ -12,6 +12,12 @@ export class Product {
     @Column()
     price: number;
 
+    @Column({nullable: true })
+    discounted_price: number;
+
+    @Column({nullable: true })
+    description: string;
+
     @Column({ nullable: true })
     category_id: number;
 

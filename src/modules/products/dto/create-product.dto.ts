@@ -1,7 +1,8 @@
-import { IsInt, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { IsInt, IsNumber, IsOptional, IsString, MaxLength, Min } from "class-validator";
 
 export class CreateProductDto {
     @IsString()
+    @MaxLength(100)
     product_name: string
 
     @IsNumber()
@@ -12,4 +13,8 @@ export class CreateProductDto {
     @Min(1)
     @IsOptional()
     category_id: number
+
+    @IsString()
+    @IsOptional()
+    description: string
 }
