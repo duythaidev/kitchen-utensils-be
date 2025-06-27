@@ -9,9 +9,6 @@ export class ProductImage {
     @Column()
     image_url: string;
 
-    @Column({ nullable: true })
-    description: string;
-
     @Column()
     product_id: number;
 
@@ -20,5 +17,5 @@ export class ProductImage {
     product: Product;
 
     @Column({ default: false })
-    isMain: boolean;
+    is_main: boolean;
 }

@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateProductImageDto } from './dto/create-product-image.dto';
-import { UpdateProductImageDto } from './dto/update-product-image.dto';
 import { ProductImage } from './entities/product-image.entity';
 
 @Injectable()
@@ -12,9 +10,17 @@ export class ProductImagesService {
         private productImageRepository: Repository<ProductImage>,
     ) { }
 
-    async create(createProductImageDto: CreateProductImageDto) {
-        const productImage = this.productImageRepository.create(createProductImageDto);
-        return await this.productImageRepository.save(productImage);
+    async create(product_id: number, isMain: boolean[], listImageUrl: string[]) {
+        const productImages = listImageUrl.map((imageUrl, index) => {
+            return this.productImageRepository.create({
+                product_id,
+                image_url: imageUrl,
+                is_main: isMain[index],
+
+            });
+        });
+        const productImagesEntities = this.productImageRepository.create(productImages);
+        return await this.productImageRepository.insert(productImagesEntities);
     }
 
     async findAll() {
