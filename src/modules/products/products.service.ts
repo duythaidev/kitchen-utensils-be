@@ -23,7 +23,7 @@ export class ProductsService {
       throw new BadRequestException('Tên sản phẩm đã tồn tại');
     }
 
-    return this.productsRepository.save(createProductDto)
+    return this.productsRepository.save(createProductDto);
   }
 
   findAll() {

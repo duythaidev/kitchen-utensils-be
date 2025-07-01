@@ -1,4 +1,3 @@
-import { Cart } from "src/modules/carts/entities/cart.entity";
 import { PrimaryGeneratedColumn, Column, Entity, UpdateDateColumn, CreateDateColumn, JoinColumn, OneToOne } from "typeorm";
 
 @Entity()
@@ -21,6 +20,12 @@ export class User {
 
     @Column({ nullable: true })
     address?: string;
+
+    @Column({ nullable: true })
+    phone_number?: string;
+
+    @Column({ nullable: true })
+    role?: string;
 
     // @Column({
     //     nullable: true,
