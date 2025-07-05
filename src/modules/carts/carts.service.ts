@@ -38,17 +38,15 @@ export class CartsService {
     return this.cartsRepository.findOne({ where: { id: user_id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
-  }
+  
 
-  async addToCart(updateCartDto: UpdateCartDto) {
+  async addToCart(updateCartDto: UpdateCartDto, user_id: number) {
     // Tim cart
-    let cart = await this.findOne(updateCartDto.user_id);
+    let cart = await this.findOne(user_id);
 
     // Ko thay thi tao
     if (!cart) {
-      cart = await this.create(updateCartDto.user_id)
+      cart = await this.create(user_id)
     }
 
     return this.cartDetailsService.addProductToCart(cart, updateCartDto.product_id, updateCartDto.quantity)
@@ -64,9 +62,9 @@ export class CartsService {
     return this.cartDetailsService.getProductsInCart(cart.id)
   }
 
-  removeFromCart(updateCartDto: UpdateCartDto) {
+  removeFromCart(user_id: number, product_id: number) {
 
-    return this.cartDetailsService.removeProductFromCart(updateCartDto.user_id, updateCartDto.product_id)
+    return this.cartDetailsService.removeProductFromCart(user_id, product_id)
   }
 
   async checkOut(user_id: number, address: string) {

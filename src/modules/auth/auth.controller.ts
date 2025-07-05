@@ -32,9 +32,10 @@ export class AuthController {
     return { access_token: token, user };
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('logout')
-  async logout(@Request() req) {
-    return req.logout();
-  }
+  // used in session
+  // @UseGuards(LocalAuthGuard)
+  // @Post('logout')
+  // async logout(@Request() req) {
+  //   return req.logout();
+  // }
 }

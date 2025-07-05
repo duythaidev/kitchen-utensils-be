@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('carts')
 export class CartsController {
@@ -12,14 +13,24 @@ export class CartsController {
   //   return this.cartsService.create(user_id);
   // }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  addToCart(@Body() updateCartDto: UpdateCartDto) {
-    return this.cartsService.addToCart(updateCartDto);
+  addToCart(@Body() updateCartDto: UpdateCartDto, @Req() req: any) {
+    console.log(updateCartDto, 'req.user', req.user)
+    return this.cartsService.addToCart(updateCartDto, req.user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.cartsService.findAll();
+  // @Get()
+  // findAll() {
+  //   return this.cartsService.findAll();
+  // }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get() 
+  getCart(@Req() req: any) {
+    console.log(req.user)
+    return this.cartsService.getProducstInCart(req.user.id);
   }
 
   // @Get(':id')
@@ -32,9 +43,10 @@ export class CartsController {
     return this.cartsService.getProducstInCart(+user_id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartsService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.cartsService.removeFromCart(+id, req.user.id);
   }
 
   @Post('checkout')

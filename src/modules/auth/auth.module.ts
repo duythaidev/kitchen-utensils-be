@@ -6,9 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv'
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
+import { JwtStrategy } from './strategy/jwt.strategy';
 dotenv.config()
 @Module({
-  imports: [UsersModule,
+  imports: [
+    UsersModule,
     PassportModule,
     JwtModule.register({
       global: true,
@@ -17,7 +19,8 @@ dotenv.config()
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy],
+  // cho vao providers de cac service trong noi bo inject dc vao constructor cua nhau
+  providers: [AuthService, LocalStrategy, JwtStrategy], 
   exports: [AuthService]
 })
 export class AuthModule { }
