@@ -26,7 +26,10 @@ export class CategoryService {
     return this.categoryRepository.find();
   }
 
-  findOne(id: number) {
+  findOne(id: number | null) {
+    if (id === null) {
+      return null;
+    }
     return this.categoryRepository.findOne({ where: { id }, });
   }
 

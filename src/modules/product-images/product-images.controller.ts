@@ -4,6 +4,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
 import axios from 'axios';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
+import { UpdateProductImageDto } from './dto/update-product-image.dto';
 
 @Controller('product-images')
 export class ProductImagesController {
@@ -19,6 +20,9 @@ export class ProductImagesController {
 
         files: Express.Multer.File[]) {
         console.log(files);
+        if (files.length > 3) {
+            throw new BadRequestException('Product images should only have max of 3 images');
+        }
         const chainPromise = files.map(file => {
             const base64 = file.buffer.toString('base64');
             const formData = new URLSearchParams();
@@ -39,15 +43,16 @@ export class ProductImagesController {
                 const imageUrl = item.data.data.url;
                 return imageUrl;
             }));
-
-            await this.productImagesService.create(createProductImageDto.product_id, createProductImageDto.isMain, listImageUrl);
+            console.log("controller", listImageUrl)
+            const res = await this.productImagesService.create(createProductImageDto.product_id, createProductImageDto.isMain, listImageUrl);
+            // console.log("controller", res)
+            return res;
         } catch (error) {
             console.log(error);
             return new BadRequestException('Error create product image');
         }
         // await Promise.all(chainCreate);
 
-        return "hello"
     }
     @Get()
     findAll() {
@@ -64,10 +69,50 @@ export class ProductImagesController {
         return this.productImagesService.findOne(+id);
     }
 
-    // @Patch(':id')
-    // update(@Param('id') id: string, @Body() updateProductImageDto: UpdateProductImageDto) {
-    //     return this.productImagesService.update(+id, updateProductImageDto);
-    // }
+    @Patch(':id')
+    @UseInterceptors(FilesInterceptor('product-images'))
+    async update(
+        @Param('id') id: string,
+        @Body() updateProductImageDto: UpdateProductImageDto,
+        @UploadedFiles(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 9_000_000 }),
+                    new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+                ],
+            })
+        )
+        files: Express.Multer.File[],
+    ) {
+        if (files.length > 3) {
+            throw new BadRequestException('Product images should only have max of 3 images');
+        }
+        try {
+            const chainPromise = files.map(file => {
+                const base64 = file.buffer.toString('base64');
+                const formData = new URLSearchParams();
+                formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
+                formData.append('image', base64);
+
+                return axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+            });
+
+            const responses = await Promise.all(chainPromise);
+            const imageUrls = responses.map(res => res.data.data.url);
+
+            const result = await this.productImagesService.update( +id, +updateProductImageDto.isMain, imageUrls );
+
+            return result;
+        } catch (error) {
+            console.error(error);
+            throw new BadRequestException('Error updating product images');
+        }
+    }
+
 
     @Delete(':id')
     remove(@Param('id') id: string) {

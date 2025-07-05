@@ -3,15 +3,16 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async signIn(@Req() req: any, @Res({ passthrough: true }) response: Response) {
-    console.log(req.user)
+    // console.log(req.user)
     const token = await this.authService.signJWT(req.user)
     return {
       access_token: token,
@@ -24,7 +25,14 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  @UseGuards(AuthGuard('local'))
+  @Post('google')
+  async googleLogin(@Body() body: { email: string, user_name: string }) {
+    const user = await this.authService.findOrCreateByGoogle(body);
+    const token = await this.authService.signJWT(user);
+    return { access_token: token, user };
+  }
+
+  @UseGuards(LocalAuthGuard)
   @Post('logout')
   async logout(@Request() req) {
     return req.logout();

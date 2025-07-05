@@ -27,6 +27,9 @@ export class UsersService {
   }
 
   async findOne(id: number) {
+    if (!id) {
+      throw new BadRequestException('Id is required');
+    }
     const user = await this.usersRepository.findOne({ where: { id } });
     // if (user && user.avatar) {
     //   const buffer = Buffer.from(user.avatar.buffer);
@@ -44,6 +47,10 @@ export class UsersService {
     return await this.usersRepository.findOne({ where: { email } });
   }
 
+  async findByAuthProvider(auth_provider: string) {
+    return await this.usersRepository.findOne({ where: { auth_provider } });
+  }
+
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     // const data = await this.httpService.get('http://localhost:8080/api/v1/products/')
@@ -59,9 +66,13 @@ export class UsersService {
 
     // const res = await axios.get('http://localhost:8080/api/v1/products')
     // console.log(res.data)
-    return this.usersRepository.update(
-      { id },
-      { ...updateUserDto }
+
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return this.usersRepository.save(
+      { id: user.id, ...updateUserDto }
     );
   }
 

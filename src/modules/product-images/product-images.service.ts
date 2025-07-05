@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductImage } from './entities/product-image.entity';
+import { UpdateProductImageDto } from './dto/update-product-image.dto';
 
 @Injectable()
 export class ProductImagesService {
@@ -10,16 +11,18 @@ export class ProductImagesService {
         private productImageRepository: Repository<ProductImage>,
     ) { }
 
-    async create(product_id: number, isMain: boolean[], listImageUrl: string[]) {
+    async create(product_id: number, isMain: number, listImageUrl: string[]) {
+        console.log("service: ", product_id, isMain, listImageUrl)
         const productImages = listImageUrl.map((imageUrl, index) => {
             return this.productImageRepository.create({
                 product_id,
                 image_url: imageUrl,
-                is_main: isMain[index],
+                is_main: isMain === index,
 
             });
         });
         const productImagesEntities = this.productImageRepository.create(productImages);
+        console.log("service: ", productImagesEntities)
         return await this.productImageRepository.insert(productImagesEntities);
     }
 
@@ -43,10 +46,32 @@ export class ProductImagesService {
         return productImage;
     }
 
-    // async update(id: number, updateProductImageDto: UpdateProductImageDto) {
-    //     const productImage = await this.findOne(id);
-    //     return await this.productImageRepository.update(productImage, updateProductImageDto);
-    // }
+    async update(product_id: number, isMain: number, listImageUrl: string[]) {
+        console.log("service: ", product_id, isMain, listImageUrl)
+        
+        const isExist = await this.findByProductId(product_id);
+
+        if (isExist === null) {
+            throw new NotFoundException(`Product image with product_id ${product_id} not found`);
+        }
+
+        if (isExist.length > 3) {
+            throw new NotFoundException(`Product images should only have max of 3 images`);
+        }
+        
+        await this.productImageRepository.delete({ product_id });
+
+        const newProductImages = listImageUrl.map((imageUrl, index) => {
+            return this.productImageRepository.create({
+                product_id,
+                image_url: imageUrl,
+                is_main: isMain === index,
+
+            });
+        });
+        const newProductImagesEntities = await this.productImageRepository.save(newProductImages);
+        return newProductImagesEntities;
+    }
 
     async remove(id: number) {
         const productImage = await this.findOne(id);

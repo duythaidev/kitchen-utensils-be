@@ -1,9 +1,16 @@
-import { IsNotEmpty, IsNumber, Max } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
 
 export class CreateReviewDto {
-    @IsNumber({ maxDecimalPlaces: 1 }, { message: 'Rating must be a number with one decimal place. (e.g: 4.5)' })
     @IsNotEmpty()
-    @Max(5, { message: 'Rating must be between 0 and 5.' })
+    @IsNumber()
+    product_id: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(1)
+    @Max(5)
     rating: number;
 
+    @IsString()
+    comment: string;
 }

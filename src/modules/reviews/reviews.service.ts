@@ -1,43 +1,142 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../products/entities/product.entity';
-import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
-    private reviewsRepository: Repository<Review>,
+    private readonly reviewRepository: Repository<Review>,
   ) { }
-  create(createReviewDto: CreateReviewDto) {
-    // const review = await this.reviewsRepository.findOne({ where: { product_id: createReviewDto.product_id, user_id: createReviewDto.user_id } });
-    // if (review) {
-    //   throw new Error('You have already reviewed this product');
-    // }
-    return this.reviewsRepository.save(createReviewDto);
+
+  async create(createReviewDto: CreateReviewDto, userId: number) {
+    try {
+      // Check if user has already reviewed this product
+      const existingReview = await this.reviewRepository.findOne({
+        where: {
+          user_id: userId,
+          product_id: createReviewDto.product_id,
+        },
+      });
+
+      if (existingReview) {
+        throw new BadRequestException('You have already reviewed this product');
+      }
+
+      const review = this.reviewRepository.create({
+        ...createReviewDto,
+        user_id: userId,
+      });
+
+      return await this.reviewRepository.save(review);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to create review');
+    }
   }
 
-  findAll() {
-    return this.reviewsRepository.find();
+  async findAll() {
+    try {
+      return await this.reviewRepository.find({
+        relations: ['user', 'product'],
+        order: {
+          created_at: 'DESC',
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch reviews');
+    }
   }
 
-  findOne(id: number) {
-    return this.reviewsRepository.findOne({ where: { id } });
+  async findOne(id: number) {
+    try {
+      const review = await this.reviewRepository.findOne({
+        where: { id },
+        relations: ['user', 'product'],
+      });
+
+      if (!review) {
+        throw new NotFoundException('Review not found');
+      }
+
+      return review;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to fetch review');
+    }
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return this.reviewsRepository.update(id, updateReviewDto);
+  async findByProduct(productId: number) {
+    try {
+      return await this.reviewRepository.find({
+        where: { product_id: productId },
+        relations: ['user', 'product'],
+        order: {
+          created_at: 'DESC',
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch product reviews');
+    }
   }
 
-  remove(id: number) {
-    return this.reviewsRepository.delete(id);
+  async update(id: number, updateReviewDto: UpdateReviewDto, userId: number) {
+    try {
+      const review = await this.reviewRepository.findOne({
+        where: { id },
+      });
+
+      if (!review) {
+        throw new NotFoundException('Review not found');
+      }
+
+      if (review.user_id !== userId) {
+        throw new BadRequestException('You can only update your own reviews');
+      }
+
+      await this.reviewRepository.update(id, updateReviewDto);
+      return await this.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to update review');
+    }
+  }
+
+  async remove(id: number, userId: number) {
+    try {
+      const review = await this.reviewRepository.findOne({
+        where: { id },
+      });
+
+      if (!review) {
+        throw new NotFoundException('Review not found');
+      }
+
+      if (review.user_id !== userId) {
+        throw new BadRequestException('You can only delete your own reviews');
+      }
+
+      await this.reviewRepository.delete(id);
+      return { message: 'Review deleted successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to delete review');
+    }
   }
 
   async getProductRating(productId: number) {
-    const reviews = await this.reviewsRepository.find({ where: { product_id: productId } });
+    const reviews = await this.reviewRepository.find({ where: { product_id: productId } });
     const rate = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
     return { reviews, averageRating: rate };
   }

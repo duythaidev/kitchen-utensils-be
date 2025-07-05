@@ -11,15 +11,18 @@ export class CreateProductImageDto {
     @IsNumber()
     product_id: number;
 
+    // index of main image
     @IsOptional()
-    @IsArray()
-    @UniqueTrueInArray({message: 'Only one image can be main'})
-    @EqualArrayLength( 'product_images', {message: 'Number of main images must be equal to number of product images'})
-    isMain: boolean[];
+    @IsNumber()
+    isMain: number;
 
     @IsOptional()
     @IsArray()
     product_images?: Buffer[];
+
+    // @IsOptional()
+    // @IsString()
+    // image_url?: string;
 
     // @IsOptional()
     // @IsString()

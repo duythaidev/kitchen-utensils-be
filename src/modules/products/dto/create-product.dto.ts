@@ -17,5 +17,9 @@ export class CreateProductDto {
     @IsString()
     @IsOptional()
     description: string
+
+    @IsInt()
+    @Min(0)
+    stock: number
     
 }

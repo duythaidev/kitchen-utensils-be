@@ -15,17 +15,20 @@ export class User {
     @Column({ nullable: true })
     user_name?: string;
 
-    @Column({ default: true })
+    @Column({ default: true, nullable: true })
     is_active: boolean;
 
     @Column({ nullable: true })
     address?: string;
 
     @Column({ nullable: true })
-    phone_number?: string;
+    phone?: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true , default: "user"})
     role?: string;
+
+    @Column({ nullable: true , default: "local"})
+    auth_provider?: string;
 
     // @Column({
     //     nullable: true,

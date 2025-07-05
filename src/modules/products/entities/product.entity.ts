@@ -13,19 +13,24 @@ export class Product {
     @Column()
     price: number;
 
+    @Column()
+    stock: number;
+    
     @Column({nullable: true })
     discounted_price: number;
 
     @Column({nullable: true })
     description: string;
 
+
     @Column({ nullable: true })
     category_id: number;
-
+    
     @ManyToOne(() => Category)
     @JoinColumn({ name: 'category_id' })
     category: Category;
 
+    // relation
     @OneToMany(() => ProductImage, productImage => productImage.product)
     images: ProductImage[];
 

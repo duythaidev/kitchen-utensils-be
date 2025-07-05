@@ -1,4 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateProductImageDto } from './create-product-image.dto';
+import { IsNotEmpty, IsNumber, IsOptional, IsArray } from 'class-validator';
 
-export class UpdateProductImageDto extends PartialType(CreateProductImageDto) {}
+export class UpdateProductImageDto {
+    @IsNotEmpty()
+    @IsNumber()
+    product_id: number;
+
+    // index of main image
+    @IsOptional()
+    @IsNumber()
+    isMain: number;
+
+    @IsOptional()
+    @IsArray()
+    product_images?: Buffer[];
+}

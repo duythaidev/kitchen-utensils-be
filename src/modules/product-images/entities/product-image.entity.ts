@@ -12,7 +12,7 @@ export class ProductImage {
     @Column()
     product_id: number;
 
-    @ManyToOne(() => Product, product => product.images, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Product)
     @JoinColumn({ name: 'product_id' })
     product: Product;
 

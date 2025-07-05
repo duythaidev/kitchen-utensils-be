@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
-import { AuthGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 require('dotenv').config()
 @Controller('users')
@@ -12,7 +12,32 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(FileInterceptor('avatar'))
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 9000000 }), new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),],
+        fileIsRequired: false, // <-- Cho phép file optional
+      })
+    ) file?: Express.Multer.File,
+  ) {
+    if (file) {
+      // console.log(file)
+      const base64 = file.buffer.toString('base64');
+
+      const formData = new URLSearchParams();
+      formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
+      formData.append('image', base64);
+
+      const res = await axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      const imageUrl = res.data.data.url;
+      createUserDto.avatar_url = imageUrl;
+    }
     return this.usersService.create(createUserDto);
   }
 
@@ -22,12 +47,21 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@Req() req: any) {
+    console.log("req.user", req.user)
+    return this.usersService.findByEmail(req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     console.log(id)
     return this.usersService.findOne(+id);
   }
+
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
@@ -37,24 +71,26 @@ export class UsersController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 9000000 }), new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),],
-      })) file: Express.Multer.File
+        fileIsRequired: false, // <-- Cho phép file optional
+      })
+    ) file?: Express.Multer.File,
   ) {
-    // updateUserDto.avatar = file.buffer
-    // console.log(process.env.Name)
-    const base64 = file.buffer.toString('base64');
+    if (file) {
+      const base64 = file.buffer.toString('base64');
 
-    const formData = new URLSearchParams();
-    formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
-    formData.append('image', base64);
+      const formData = new URLSearchParams();
+      formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
+      formData.append('image', base64);
 
-    const res = await axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+      const res = await axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
 
-    const imageUrl = res.data.data.url;
-    updateUserDto.avatar_url = imageUrl;
+      const imageUrl = res.data.data.url;
+      updateUserDto.avatar_url = imageUrl;
+    }
     return this.usersService.update(+id, updateUserDto,);
   }
 
@@ -63,8 +99,13 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Delete()
-  ban(@Body('id') id: string) {
+  @Post('ban/:id')
+  ban(@Param('id') id: string) {
+    return this.usersService.ban(+id, false);
+  }
+
+  @Post('unban/:id')
+  unban(@Param('id') id: string) {
     return this.usersService.ban(+id, true);
   }
 

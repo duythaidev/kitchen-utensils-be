@@ -3,6 +3,9 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
+// user local passport dang nhap tra ve jwt token
+// jwt passport dung de validate token
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,10 +28,10 @@ export class AuthService {
   //   };
   // }
   async signJWT(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { email: user.email, sub: user.id };
     return this.jwtService.sign(payload);
   }
-  
+
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && user.password === pass) {
@@ -44,6 +47,12 @@ export class AuthService {
       throw new BadRequestException('Email already in use');
     }
 
-    return this.usersService.create(createUserDto);
+    return this.usersService.create({ ...createUserDto, auth_provider: "local" });
+  }
+
+  async findOrCreateByGoogle(body: { email: string, user_name: string }) {
+    const user = await this.usersService.findByEmail(body.email);
+    if (user) return user;
+    return this.usersService.create({ email: body.email, user_name: body.user_name, password: "", auth_provider: "google" });
   }
 }

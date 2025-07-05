@@ -20,14 +20,23 @@ export function IsImageFile(options?: ValidationOptions) {
 export class UpdateUserDto {
     @IsString()
     @MaxLength(25)
-    @IsOptional()
     user_name: string
 
     @IsOptional()
     avatar_url?: string;
 
+    // @IsOptional()
+    // avatar?: Express.Multer.File;
+
+    @IsOptional()
+    role?: string;
+
+    @IsString()
+    @IsOptional()
+    phone?: string;
+    
     @IsString()
     @MaxLength(100)
     @IsOptional()
-    address: string;
+    address?: string;
 }

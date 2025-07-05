@@ -16,9 +16,15 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
     @Min(1)
     category_id: number
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
+    @Min(0)
     discounted_price: number
+
+    @IsInt()
+    @IsOptional()
+    @Min(0)
+    stock: number
 
     @IsString()
     @IsOptional()
