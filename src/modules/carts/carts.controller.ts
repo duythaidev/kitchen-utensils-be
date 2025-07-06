@@ -20,16 +20,22 @@ export class CartsController {
     return this.cartsService.addToCart(updateCartDto, req.user.id);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.cartsService.findAll();
+  @Get()
+  findAll() {
+    return this.cartsService.findAll();
+  }
+
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get() 
+  // getCart(@Req() req: any) {
+  //   console.log(req.user)
+  //   return this.cartsService.getProducstInCart(req.user.id);
   // }
 
-
   @UseGuards(JwtAuthGuard)
-  @Get() 
-  getCart(@Req() req: any) {
-    console.log(req.user)
+  @Get('me')
+  getCartMe(@Req() req: any) {
     return this.cartsService.getProducstInCart(req.user.id);
   }
 
@@ -38,10 +44,10 @@ export class CartsController {
   //   return this.cartsService.findOne(+user_id);
   // }
 
-  @Get(':id')
-  getProductsInCart(@Param('id') user_id: string) {
-    return this.cartsService.getProducstInCart(+user_id);
-  }
+  // @Get(':id')
+  // getProductsInCart(@Param('id') user_id: string) {
+  //   return this.cartsService.getProducstInCart(+user_id);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

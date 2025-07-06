@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { CreateUserGoogleDto } from '../users/dto/create-user-google.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,8 +27,8 @@ export class AuthController {
   }
 
   @Post('google')
-  async googleLogin(@Body() body: { email: string, user_name: string }) {
-    const user = await this.authService.findOrCreateByGoogle(body);
+  async googleLogin(@Body() createUserGoogleDto: CreateUserGoogleDto) {
+    const user = await this.authService.findOrCreateByGoogle(createUserGoogleDto);
     const token = await this.authService.signJWT(user);
     return { access_token: token, user };
   }

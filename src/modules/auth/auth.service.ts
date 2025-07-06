@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-
+import { CreateUserGoogleDto } from '../users/dto/create-user-google.dto';
 // user local passport dang nhap tra ve jwt token
 // jwt passport dung de validate token
 
@@ -50,9 +50,9 @@ export class AuthService {
     return this.usersService.create({ ...createUserDto, auth_provider: "local" });
   }
 
-  async findOrCreateByGoogle(body: { email: string, user_name: string }) {
-    const user = await this.usersService.findByEmail(body.email);
+  async findOrCreateByGoogle(createUserGoogleDto: CreateUserGoogleDto) {
+    const user = await this.usersService.findByEmail(createUserGoogleDto.email);
     if (user) return user;
-    return this.usersService.create({ email: body.email, user_name: body.user_name, password: "", auth_provider: "google" });
+    return this.usersService.create({ email: createUserGoogleDto.email, avatar_url: createUserGoogleDto.avatar_url, user_name: createUserGoogleDto.user_name, password: "", auth_provider: "google" });
   }
 }
