@@ -31,11 +31,11 @@ export class CartsService {
   }
 
   findAll() {
-    return `This action returns all carts`;
+    return this.cartsRepository.find();
   }
 
   async findOne(user_id: number) {
-    return this.cartsRepository.findOne({ where: { id: user_id } });
+    return this.cartsRepository.findOne({ where: { user_id } });
   }
 
   
@@ -54,7 +54,7 @@ export class CartsService {
 
   async getProducstInCart(user_id: number) {
     let cart = await this.findOne(user_id);
-
+    console.log("cart", cart)
     // Ko thay thi tao
     if (!cart) {
       cart = await this.create(user_id)
@@ -68,7 +68,11 @@ export class CartsService {
   }
 
   async checkOut(user_id: number, address: string) {
-    const cart = await this.cartsRepository.findOne({ where: { id: user_id } });
+    const cart = await this.cartsRepository.findOne({ where: { user_id },
+      relations: {
+        user: true
+      }
+    });
     if (!cart) {
       throw new BadRequestException('Cart not found');
     }

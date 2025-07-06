@@ -13,21 +13,27 @@ import { PricingService } from '../pricing/pricing.service';
 @Injectable()
 export class CartDetailsService {
 
-
   constructor(
     @InjectRepository(CartDetail)
     private cartDetailsRepository: Repository<CartDetail>,
     private readonly productsService: ProductsService,
     private readonly ordersService: OrdersService,
     private readonly orderDetailsService: OrderDetailsService,
-    private readonly pricingService: PricingService,
-
   ) { }
 
   async clearCart(cart: Cart, address: string) {
-    const cartItems = await this.cartDetailsRepository.find({ where: { cart_id: cart.id } });
+    console.log('>>> cart', cart)
+    const cartItems = await this.cartDetailsRepository.find({ where: { 
+      cart_id: cart.id
+     },
+     relations: {
+      product: true
+     }
+    });
     // console.log(cartItems.forEach(item => console.log(item.)));
-    const total_price = this.pricingService.calculateTotalVAT(cartItems);
+    console.log('>>> cartItems', cartItems)
+    const total_price = cartItems.reduce((total, item) => total + (item.product?.discounted_price || item.product?.price) * item.quantity, 0);
+    console.log('>>> total_price', total_price)
     const createOrderDto: CreateOrderDto = {
       address,
       total_price,
@@ -49,11 +55,19 @@ export class CartDetailsService {
   }
 
   findAll() {
-    return `This action returns all cartDetails`;
+    return this.cartDetailsRepository.find()
   }
 
   getProductsInCart(cart_id: number) {
-    return this.cartDetailsRepository.find({ where: { cart_id } })
+    return this.cartDetailsRepository.find(
+      {
+        where: { cart_id },
+        relations: {
+          product: { // product : true
+            images: true // product relations : {images: true}
+          },
+        }
+      })
   }
 
   async addProductToCart(cart: Cart, product_id: number, quantity: number) {

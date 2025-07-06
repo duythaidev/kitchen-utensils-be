@@ -9,7 +9,7 @@ export class CartDetail {
     @Column()
     product_id: number
 
-    @ManyToOne(() => Product, (product) => product.id)
+    @ManyToOne(() => Product)
     @JoinColumn({ name: 'product_id' })
     product: Product
 
@@ -19,7 +19,7 @@ export class CartDetail {
     @Column()
     cart_id: number
 
-    @ManyToOne(() => Cart, cart => cart.cart_detail)
+    @ManyToOne(() => Cart)
     @JoinColumn({ name: 'cart_id' })
     cart: Cart;
 }

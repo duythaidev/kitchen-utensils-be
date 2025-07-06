@@ -13,8 +13,8 @@ export class ProductsController {
   }
 
   @Get()
-  findByFilter(@Query() query:{ search?: string, page?: string, limit?: string }) {
-    console.log(query)
+  async getByFilter(@Query('keyword') keyword: string, @Query('page') page: number, @Query('limit') limit: number) {
+    console.log("keyword: ", keyword, "page: ", page, "limit: ", limit)
     return this.productsService.findAll();
   }
 

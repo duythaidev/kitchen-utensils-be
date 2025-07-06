@@ -55,9 +55,12 @@ export class CartsController {
     return this.cartsService.removeFromCart(+id, req.user.id);
   }
 
+
+  @UseGuards(JwtAuthGuard)
   @Post('checkout')
-  async checkout(@Body() body: { userId: number; address: string }) {
-    const { userId, address } = body;
-    return this.cartsService.checkOut(userId, address);
+  async checkout(@Body() body: { address: string }, @Req() req: any) {
+    const { address } = body;
+    // console.log('>>> req.user', req.user, 'address', address)
+    return this.cartsService.checkOut(req.user.id, address);
   }
 }

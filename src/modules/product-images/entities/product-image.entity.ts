@@ -12,7 +12,7 @@ export class ProductImage {
     @Column()
     product_id: number;
 
-    @ManyToOne(() => Product)
+    @ManyToOne(() => Product, (product) => product.images)
     @JoinColumn({ name: 'product_id' })
     product: Product;
 

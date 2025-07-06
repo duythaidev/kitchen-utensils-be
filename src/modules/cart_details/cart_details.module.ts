@@ -6,7 +6,6 @@ import { CartDetail } from './entities/cart_detail.entity';
 import { ProductsModule } from '../products/products.module';
 import { OrderDetailsModule } from '../order-details/order-details.module';
 import { OrdersModule } from '../orders/orders.module';
-import { PricingModule } from '../pricing/pricing.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { PricingModule } from '../pricing/pricing.module';
     ProductsModule,
     OrdersModule,
     OrderDetailsModule,
-    PricingModule
   ],
   controllers: [CartDetailsController],
   providers: [CartDetailsService],

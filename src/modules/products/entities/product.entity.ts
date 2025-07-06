@@ -29,6 +29,7 @@ export class Product {
     @ManyToOne(() => Category)
     @JoinColumn({ name: 'category_id' })
     category: Category;
+    
 
     // relation
     @OneToMany(() => ProductImage, productImage => productImage.product)

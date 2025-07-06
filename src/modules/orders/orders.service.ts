@@ -9,26 +9,26 @@ import { Repository } from 'typeorm';
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
-    private cartDetailsRepository: Repository<Order>,
+    private orderRepository: Repository<Order>,
   ) { }
   
   create(createOrderDto: CreateOrderDto) {
-    return this.cartDetailsRepository.save(createOrderDto);
+    return this.orderRepository.save(createOrderDto);
   }
 
   findAll() {
-    return `This action returns all orders`;
+    return this.orderRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} order`;
+    return this.orderRepository.findOne({ where: { id } });
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+    return this.orderRepository.update(id, updateOrderDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} order`;
+    return this.orderRepository.delete(id);
   }
 }

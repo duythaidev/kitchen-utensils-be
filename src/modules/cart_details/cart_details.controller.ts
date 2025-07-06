@@ -7,10 +7,10 @@ import { UpdateCartDetailDto } from './dto/update-cart_detail.dto';
 export class CartDetailsController {
   constructor(private readonly cartDetailsService: CartDetailsService) {}
 
-  // @Get()
-  // findAll() {
-  //   return this.cartDetailsService.findAll();
-  // }
+  @Get()
+  findAll() {
+    return this.cartDetailsService.findAll();
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
