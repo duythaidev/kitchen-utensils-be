@@ -15,7 +15,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { OrderDetailsModule } from './modules/order-details/order-details.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
-
+import { StatisticModule } from './modules/statistic/statistic.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +33,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     OrderDetailsModule,
     ReviewsModule,
     ProductImagesModule,
+    StatisticModule,
   ],
   controllers: [AppController],
   providers: [AppService],

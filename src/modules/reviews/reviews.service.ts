@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -14,7 +14,6 @@ export class ReviewsService {
 
   async create(createReviewDto: CreateReviewDto, userId: number) {
     try {
-      // Check if user has already reviewed this product
       const existingReview = await this.reviewRepository.findOne({
         where: {
           user_id: userId,
@@ -30,9 +29,10 @@ export class ReviewsService {
         ...createReviewDto,
         user_id: userId,
       });
-
-      return await this.reviewRepository.save(review);
+      
+      return await this.reviewRepository.save(review)
     } catch (error) {
+      Logger.log("error", error)
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -43,7 +43,10 @@ export class ReviewsService {
   async findAll() {
     try {
       return await this.reviewRepository.find({
-        relations: ['user', 'product'],
+        relations: {
+          user: true,
+          product: true,
+        },
         order: {
           created_at: 'DESC',
         },
@@ -57,7 +60,10 @@ export class ReviewsService {
     try {
       const review = await this.reviewRepository.findOne({
         where: { id },
-        relations: ['user', 'product'],
+        relations: {
+          user: true,
+          product: true,  
+        },
       });
 
       if (!review) {
@@ -77,7 +83,10 @@ export class ReviewsService {
     try {
       return await this.reviewRepository.find({
         where: { product_id: productId },
-        relations: ['user', 'product'],
+        relations: {
+          user: true,
+          product: true,
+        },
         order: {
           created_at: 'DESC',
         },
@@ -111,10 +120,10 @@ export class ReviewsService {
     }
   }
 
-  async remove(id: number, userId: number) {
+  async remove( productId: number, userId: number) {
     try {
       const review = await this.reviewRepository.findOne({
-        where: { id },
+        where: { product_id: productId, user_id: userId },
       });
 
       if (!review) {
@@ -125,7 +134,7 @@ export class ReviewsService {
         throw new BadRequestException('You can only delete your own reviews');
       }
 
-      await this.reviewRepository.delete(id);
+      await this.reviewRepository.delete(review.id);
       return { message: 'Review deleted successfully' };
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {

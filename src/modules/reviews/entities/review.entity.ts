@@ -29,7 +29,7 @@ export class Review {
     @JoinColumn({ name: 'product_id' })
     product: Product;
 
-    @Column({ type: 'decimal', precision: 1, scale: 1, default: 0 })
+    @Column({ type: 'decimal', precision: 5, scale: 1, default: 0 })
     rating: number;
 
     @Column({ type: 'text', nullable: true })

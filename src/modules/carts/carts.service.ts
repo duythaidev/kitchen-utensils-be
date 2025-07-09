@@ -62,9 +62,21 @@ export class CartsService {
     return this.cartDetailsService.getProductsInCart(cart.id)
   }
 
-  removeFromCart(user_id: number, product_id: number) {
+  async removeFromCart(product_id: number, user_id: number) {
+    const cart = await this.findOne(user_id)
+    if (!cart) {
+      throw new BadRequestException('Cart not found')
+    }
+    return this.cartDetailsService.removeProductFromCart(product_id, cart.id)
+  }
 
-    return this.cartDetailsService.removeProductFromCart(user_id, product_id)
+  async updateQuantity(product_id: number, quantity: number, user_id: number) {
+
+    const cart = await this.findOne(user_id)
+    if (!cart) {
+      throw new BadRequestException('Cart not found')
+    }
+    return this.cartDetailsService.updateQuantity(product_id, quantity, cart.id)
   }
 
   async checkOut(user_id: number, address: string) {

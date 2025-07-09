@@ -11,17 +11,47 @@ export class OrdersService {
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
   ) { }
-  
+
   create(createOrderDto: CreateOrderDto) {
     return this.orderRepository.save(createOrderDto);
   }
 
   findAll() {
-    return this.orderRepository.find();
+    return this.orderRepository.find({
+      relations: {
+        user: true,
+        orderDetails: {
+          product: {
+            images: true,
+          },
+        },
+      },
+    });
+  }
+
+  findAllWithCondition(query: any) {
+    return this.orderRepository.find(query);
   }
 
   findOne(id: number) {
     return this.orderRepository.findOne({ where: { id } });
+  }
+
+  findUserOrdersHistory(user_id: number) {
+    return this.orderRepository.find({
+      where: { user_id },
+      relations: {
+        orderDetails: {
+          product: {
+            images: true,
+          },
+        },
+      }
+    });
+  }
+
+  updateStatus(id: number, status: string) {
+    return this.orderRepository.update(id, { status });
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {

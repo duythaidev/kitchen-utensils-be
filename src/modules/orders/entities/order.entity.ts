@@ -1,3 +1,4 @@
+import { IsEnum } from 'class-validator';
 import { OrderDetail } from 'src/modules/order-details/entities/order-detail.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import {
@@ -32,7 +33,8 @@ export class Order {
   total_price: number;
 
   @Column({ default: 'pending' })
-  status: string; // pending | paid | shipped | completed
+  @IsEnum(['pending', 'processing', 'delivered', 'cancelled'])
+  status: string; 
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
   created_at: Date;

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FilterProductDto } from './dto/filter-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -11,12 +12,12 @@ export class ProductsController {
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
-
   @Get()
-  async getByFilter(@Query('keyword') keyword: string, @Query('page') page: number, @Query('limit') limit: number) {
-    console.log("keyword: ", keyword, "page: ", page, "limit: ", limit)
-    return this.productsService.findAll();
+  async getByFilter(@Query() query: FilterProductDto) {
+    return this.productsService.getFilteredProducts(query);
   }
+
+  
 
   // @Get()
   // findAll() {

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Put } from '@nestjs/common';
 import { CartDetailsService } from './cart_details.service';
-import { CreateCartDetailDto } from './dto/create-cart_detail.dto';
 import { UpdateCartDetailDto } from './dto/update-cart_detail.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('cart-details')
 export class CartDetailsController {
@@ -12,18 +13,8 @@ export class CartDetailsController {
     return this.cartDetailsService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.cartDetailsService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateCartDetailDto: UpdateCartDetailDto) {
-  //   return this.cartDetailsService.update(+id, updateCartDetailDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.cartDetailsService.removeProductFromCart(+id);
-  // }
+  @Put()
+  update(@Body() updateCartDetailDto: UpdateCartDetailDto) {
+    return this.cartDetailsService.update(updateCartDetailDto);
+  }
 }

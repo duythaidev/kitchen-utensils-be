@@ -8,7 +8,6 @@ import { ProductsService } from '../products/products.service';
 import { OrdersService } from '../orders/orders.service';
 import { OrderDetailsService } from '../order-details/order-details.service';
 import { CreateOrderDto } from '../orders/dto/create-order.dto';
-import { PricingService } from '../pricing/pricing.service';
 
 @Injectable()
 export class CartDetailsService {
@@ -23,12 +22,13 @@ export class CartDetailsService {
 
   async clearCart(cart: Cart, address: string) {
     console.log('>>> cart', cart)
-    const cartItems = await this.cartDetailsRepository.find({ where: { 
-      cart_id: cart.id
-     },
-     relations: {
-      product: true
-     }
+    const cartItems = await this.cartDetailsRepository.find({
+      where: {
+        cart_id: cart.id
+      },
+      relations: {
+        product: true
+      }
     });
     // console.log(cartItems.forEach(item => console.log(item.)));
     console.log('>>> cartItems', cartItems)
@@ -88,11 +88,17 @@ export class CartDetailsService {
     return `This action returns a #${id} cartDetail`;
   }
 
-  update(id: number, updateCartDetailDto: UpdateCartDetailDto) {
-    return `This action updates a #${id} cartDetail`;
+  update(updateCartDetailDto: UpdateCartDetailDto) {
+    return this.cartDetailsRepository.update(updateCartDetailDto.product_id, { quantity: updateCartDetailDto.quantity })
   }
 
-  removeProductFromCart(user_id: number, product_id: number) {
-    return this.cartDetailsRepository.delete({ cart: { user_id }, product: { id: product_id } })
+  updateQuantity(product_id: number, quantity: number, cart_id: number) {
+    return this.cartDetailsRepository.update({ cart_id, product_id }, {
+      quantity
+    })
+  }
+
+  removeProductFromCart(product_id: number, cart_id: number) {
+    return this.cartDetailsRepository.delete({ cart_id, product_id })
   }
 }

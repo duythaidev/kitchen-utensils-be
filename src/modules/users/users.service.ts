@@ -26,6 +26,10 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
+  findAllWithCondition(query: any) {
+    return this.usersRepository.find(query);
+  }
+
   async findOne(id: number) {
     if (!id) {
       throw new BadRequestException('Id is required');
