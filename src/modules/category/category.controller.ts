@@ -18,7 +18,7 @@ export class CategoryController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5_000_000 }),
-          new FileTypeValidator({ fileType: /\.(jpg|jpeg|png)$/ }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
         fileIsRequired: false,
       }),
@@ -73,7 +73,7 @@ export class CategoryController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5_000_000 }),
-          new FileTypeValidator({ fileType: /\.(jpg|jpeg|png)$/ }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
         fileIsRequired: false,
       }),

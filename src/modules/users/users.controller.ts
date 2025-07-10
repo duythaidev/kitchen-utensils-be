@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards, Req, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-
+import { FilterUserDto } from './dto/filter-user.dto';
 require('dotenv').config()
 @Controller('users')
 export class UsersController {
@@ -43,8 +43,8 @@ export class UsersController {
 
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() filterDto: FilterUserDto) {
+    return this.usersService.getFilteredUsers(filterDto);
   }
 
 
