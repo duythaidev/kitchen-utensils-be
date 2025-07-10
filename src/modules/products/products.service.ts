@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Not, Repository } from 'typeorm';
+import { Between, In, LessThanOrEqual, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CategoryService } from '../category/category.service';
 import { FilterProductDto } from './dto/filter-product.dto';
@@ -37,37 +37,45 @@ export class ProductsService {
   }
 
   async getFilteredProducts(query: FilterProductDto) {
-    const { keyword, sort, priceSort, priceFrom, priceTo, category, page, limit  } = query;
-    
+    const { keyword, sort, priceSort, priceFrom, priceTo, category, page, limit } = query;
+    console.log(query)
     const pageNumber = page ? parseInt(page) : 1;
     const limitNumber = limit ? parseInt(limit) : 6;
 
     const where: any = {};
 
-    // Lọc theo keyword (trong product_name hoặc description)
     if (keyword) {
       where.product_name = Like(`%${keyword.toLowerCase()}%`);
     }
 
-    // Lọc khoảng giá
-    if (priceFrom !== undefined || priceTo !== undefined) {
-      where.price = {};
-      if (priceFrom !== undefined) where.price['>='] = priceFrom;
-      if (priceTo !== undefined) where.price['<='] = priceTo;
+    if (priceFrom !== undefined && priceTo !== undefined) {
+      where.price = Between(+priceFrom, +priceTo);
+    } else if (priceFrom !== undefined) {
+      where.price = MoreThanOrEqual(+priceFrom);
+    } else if (priceTo !== undefined) {
+      where.price = LessThanOrEqual(+priceTo);
     }
 
-    // Lọc theo category
     if (category && category.length > 0) {
       where.category = { id: In(category) };
     }
+    
 
     // Sắp xếp
     const order: any = {};
     if (priceSort) {
-      order.price = priceSort;
-    } else if (sort === 'latest') {
+      order.discounted_price = priceSort === 'lth' ? 'ASC' : 'DESC';
+      order.price = priceSort === 'lth' ? 'ASC' : 'DESC';
+    }
+    console.log(order)
+
+
+    if (sort === 'newest') {
       order.created_at = 'DESC';
     }
+    //  else if (sort === 'bestseller') {
+    //   order.stars = 'DESC'; 
+    // }
 
     const [items, total] = await this.productsRepository.findAndCount({
       where,
@@ -91,6 +99,7 @@ export class ProductsService {
         },
       },
     });
+    console.log(items.length)
 
     return {
       data: items,

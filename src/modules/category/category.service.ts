@@ -3,7 +3,8 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Not, Repository } from 'typeorm';
+import { Like, Not, Repository } from 'typeorm';
+import { FilterCategoryDto } from './dto/filter-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -20,6 +21,35 @@ export class CategoryService {
     }
 
     return this.categoryRepository.save(createCategoryDto);
+  }
+
+  async getFilteredCategories(filterDto: FilterCategoryDto) {
+    const { keyword, page, limit } = filterDto;
+
+    const pageNumber = page ? parseInt(page) : 1;
+    const limitNumber = limit ? parseInt(limit) : 6;
+
+    const where: any = {};
+
+    if (keyword) {
+      where.category_name = Like(`%${keyword.toLowerCase()}%`);
+    }
+
+    const [categories, total] = await this.categoryRepository.findAndCount({
+      where,
+      skip: (pageNumber - 1) * limitNumber,
+      take: limitNumber,
+    });
+
+    return {
+      data: categories,
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+    };
   }
 
   findAll() {
