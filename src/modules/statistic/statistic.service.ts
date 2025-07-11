@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrdersService } from '../orders/orders.service';
 import { ProductsService } from '../products/products.service';
 import { UsersService } from '../users/users.service';
@@ -12,7 +12,7 @@ export class StatisticService {
         private readonly ordersService: OrdersService,
     ) { }
 
-    async getStatistics() {
+    async getStatisticsThisMonth() {
 
         const ordersIn2Month = await this.ordersService.findAllWithCondition({
             where: {
@@ -49,5 +49,11 @@ export class StatisticService {
             orders: { totalOrders: ordersThisMonth.length, percent: ordersLastMonth.length ? (ordersThisMonth.length - ordersLastMonth.length / ordersLastMonth.length) * 100 : 0 },
             cancledOrders: { totalCancledOrders: cancledOrdersThisMonth.length, percent: cancledOrdersLastMonth.length ? (cancledOrdersThisMonth.length - cancledOrdersLastMonth.length / cancledOrdersLastMonth.length) * 100 : 0 },
         };
+    }
+    async getPeriodStatistics(query: any) {
+        if (!query.range || !['7d', '30d', '90d'].includes(query.range)) {
+            throw new BadRequestException('Invalid range parameter');
+        }
+        return this.ordersService.getRevenueStats(query.range);
     }
 }

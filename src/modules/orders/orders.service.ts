@@ -3,7 +3,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { Like, Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { FilterOrderDto } from './dto/filter-order.dto';
 
 @Injectable()
@@ -53,6 +53,59 @@ export class OrdersService {
         limit: limitNumber
       }
     };
+  }
+
+
+  async getRevenueStats(range: '7d' | '30d' | '90d') {
+    const now = new Date();
+    const endDate = new Date(now); // giữ lại mốc hiện tại
+    let startDate: Date;
+    let totalDays = 7;
+
+    if (range === '7d') {
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 6); // lấy 7 ngày bao gồm hôm nay
+      totalDays = 7;
+    } else if (range === '30d') {
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 29); // 30 ngày
+      totalDays = 30;
+    } else {
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 89); // 90 ngày
+      totalDays = 90;
+    }
+
+    const orders = await this.orderRepository.find({
+      where: {
+        created_at: Between(startDate, endDate),
+        status: 'delivered',
+      },
+      select: ['created_at', 'total_price'],
+    });
+
+    // Gom revenue theo ngày
+    const revenueByDate: Record<string, number> = {};
+
+    for (const order of orders) {
+      const dateStr = order.created_at.toISOString().slice(0, 10); // YYYY-MM-DD
+      revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + order.total_price;
+    }
+
+    // Tạo danh sách ngày liên tục để đảm bảo không thiếu ngày
+    const result: { date: string; revenue: number }[] = [];
+
+    for (let i = 0; i < totalDays; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      const key = date.toISOString().slice(0, 10);
+      result.push({
+        date: key,
+        revenue: revenueByDate[key] || 0,
+      });
+    }
+
+    return result;
   }
 
 

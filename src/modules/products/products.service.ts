@@ -1,11 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Between, In, LessThanOrEqual, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
-import { Product } from './entities/product.entity';
-import { CategoryService } from '../category/category.service';
-import { FilterProductDto } from './dto/filter-product.dto';
+import { Injectable, BadRequestException } from '@nestjs/common'
+import { CreateProductDto } from './dto/create-product.dto'
+import { UpdateProductDto } from './dto/update-product.dto'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Between, In, LessThanOrEqual, Like, MoreThanOrEqual, Not, Raw, Repository } from 'typeorm'
+import { Product } from './entities/product.entity'
+import { CategoryService } from '../category/category.service'
+import { FilterProductDto } from './dto/filter-product.dto'
 @Injectable()
 export class ProductsService {
   constructor(
@@ -19,87 +19,76 @@ export class ProductsService {
       where: {
         product_name: createProductDto.product_name,
       },
-    });
+    })
 
 
 
     if (isExist !== null) {
-      throw new BadRequestException('Tên sản phẩm đã tồn tại');
+      throw new BadRequestException('Tên sản phẩm đã tồn tại')
     }
     if (createProductDto.category_id) {
 
-      const category = await this.categoryService.findOne(createProductDto.category_id);
+      const category = await this.categoryService.findOne(createProductDto.category_id)
       if (category === null) {
-        throw new BadRequestException('Danh mục không tồn tại');
+        throw new BadRequestException('Danh mục không tồn tại')
       }
     }
-    return this.productsRepository.save(createProductDto);
+    return this.productsRepository.save(createProductDto)
   }
 
   async getFilteredProducts(query: FilterProductDto) {
-    const { keyword, sort, priceSort, priceFrom, priceTo, category, page, limit } = query;
-    console.log(query)
-    const pageNumber = page ? parseInt(page) : 1;
-    const limitNumber = limit ? parseInt(limit) : 6;
 
-    const where: any = {};
+    // class already parse pricefrom , priceto to 0
+    const { keyword, sort, priceSort, priceFrom, priceTo, categoryId, page, limit } = query
+    console.log(query)
+    const pageNumber = page ? page : 1
+    const limitNumber = limit ? limit : 6
+
+
+    const where: any = {}
+
+    const qb = this.productsRepository
+      .createQueryBuilder("product")
+      .leftJoinAndSelect("product.category", "category")
+      .leftJoinAndSelect("product.images", "images")
+      .addSelect("COALESCE(product.discounted_price, product.price)", "effective_price") 
 
     if (keyword) {
-      where.product_name = Like(`%${keyword.toLowerCase()}%`);
+      qb.andWhere("LOWER(product.product_name) LIKE :keyword", { keyword: `%${keyword.toLowerCase()}%` })
     }
 
-    if (priceFrom !== undefined && priceTo !== undefined) {
-      where.price = Between(+priceFrom, +priceTo);
-    } else if (priceFrom !== undefined) {
-      where.price = MoreThanOrEqual(+priceFrom);
-    } else if (priceTo !== undefined) {
-      where.price = LessThanOrEqual(+priceTo);
+    if (priceFrom !== 0 && priceTo !== 0) {
+      qb.andWhere("COALESCE(product.discounted_price, product.price) BETWEEN :from AND :to", {
+        from: priceFrom,
+        to: priceTo,
+      })
+    } else if (priceFrom !== 0) {
+      qb.andWhere("COALESCE(product.discounted_price, product.price) >= :from", { from: priceFrom })
+    } else if (priceTo !== 0) {
+      qb.andWhere("COALESCE(product.discounted_price, product.price) <= :to", { to: priceTo })
     }
 
-    if (category && category.length > 0) {
-      where.category = { id: In(category) };
+    if (categoryId) {
+      qb.andWhere("category.id = :category", { category: categoryId })
     }
-    
 
-    // Sắp xếp
-    const order: any = {};
-    if (priceSort) {
-      order.discounted_price = priceSort === 'lth' ? 'ASC' : 'DESC';
-      order.price = priceSort === 'lth' ? 'ASC' : 'DESC';
+    // console.log("priceSort", priceSort)
+    if (sort === "newest") {
+      qb.orderBy("product.created_at", "DESC")
     }
-    console.log(order)
 
-
-    if (sort === 'newest') {
-      order.created_at = 'DESC';
+    if (priceSort === "lth") {
+      qb.orderBy("effective_price", "ASC")
+    } else if (priceSort === "htl") {
+      qb.orderBy("effective_price", "DESC")
     }
-    //  else if (sort === 'bestseller') {
-    //   order.stars = 'DESC'; 
-    // }
 
-    const [items, total] = await this.productsRepository.findAndCount({
-      where,
-      relations: {
-        category: true,
-        images: true,
-      },
-      order,
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      select: {
-        id: true,
-        product_name: true,
-        price: true,
-        discounted_price: true,
-        stock: true,
-        description: true,
-        category: {
-          id: true,
-          category_name: true,
-        },
-      },
-    });
-    console.log(items.length)
+    const [items, total] = await qb
+      .skip((pageNumber - 1) * limitNumber)
+      .take(limitNumber)
+      .getManyAndCount()
+
+
 
     return {
       data: items,
@@ -109,7 +98,7 @@ export class ProductsService {
         total,
         totalPages: Math.ceil(total / limitNumber),
       },
-    };
+    }
   }
 
 
@@ -131,12 +120,12 @@ export class ProductsService {
         category: true,
         images: true // one to many
       },
-    });
+    })
   }
 
 
   findCategory(id: number) {
-    return this.productsRepository.find({ where: { category_id: id } });
+    return this.productsRepository.find({ where: { category_id: id } })
   }
 
 
@@ -160,24 +149,24 @@ export class ProductsService {
         category: true,
         images: true // one to many
       },
-    });
+    })
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.productsRepository.findOne({ where: { id: Not(id), product_name: updateProductDto.product_name } });
+    const product = await this.productsRepository.findOne({ where: { id: Not(id), product_name: updateProductDto.product_name } })
     if (product !== null) {
-      throw new BadRequestException('Tên sản phẩm đã tồn tại');
+      throw new BadRequestException('Tên sản phẩm đã tồn tại')
     }
     if (updateProductDto.category_id) {
-      const category = await this.categoryService.findOne(updateProductDto.category_id);
+      const category = await this.categoryService.findOne(updateProductDto.category_id)
       if (category === null) {
-        throw new BadRequestException('Danh mục không tồn tại');
+        throw new BadRequestException('Danh mục không tồn tại')
       }
     }
-    return this.productsRepository.update(id, updateProductDto);
+    return this.productsRepository.update(id, updateProductDto)
   }
 
   remove(id: number) {
-    return this.productsRepository.delete(id);
+    return this.productsRepository.delete(id)
   }
 }

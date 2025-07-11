@@ -1,11 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumberString,
-  IsIn,
-  IsArray,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsString, IsNumberString, IsIn, IsArray, IsNumber, } from 'class-validator';
 
 export class FilterProductDto {
   @IsOptional()
@@ -13,37 +6,26 @@ export class FilterProductDto {
   keyword?: string;
 
   @IsOptional()
-  @IsIn(['newest', 'bestseller'])
   sort?: string;
 
   @IsOptional()
-  @IsIn(['htl', 'lth']) // high to low, low to high
   priceSort?: string;
 
   @IsOptional()
-  @IsNumberString()
-  priceFrom?: string;
+  priceFrom?: number;
 
   @IsOptional()
-  @IsNumberString()
-  priceTo?: string;
+  priceTo?: number;
 
   @IsOptional()
-  @Transform(({ value }) =>
-    typeof value === 'string'
-      ? value.split(',').map((v) => Number(v))
-      : Array.isArray(value)
-        ? value.map(Number)
-        : [],
-  )
-  category?: number[];
+  categoryId?: number;
 
 
   @IsOptional()
-  @IsNumberString()
-  page?: string;
+  @IsNumber()
+  page?: number;
 
   @IsOptional()
-  @IsNumberString()
-  limit?: string;
+  @IsNumber()
+  limit?: number;
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, FileTypeValidator, MaxFileSizeValidator, ParseFilePipe, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, FileTypeValidator, MaxFileSizeValidator, ParseFilePipe, UploadedFile, UseInterceptors, Query, BadRequestException } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -8,7 +8,33 @@ import { FilterCategoryDto } from './dto/filter-category.dto';
 
 @Controller('categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
+
+  // @UseInterceptors(FileInterceptor('avatar'))
+  // async create(
+  //   @Body() createUserDto: CreateUserDto,
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators: [new MaxFileSizeValidator({ maxSize: 9000000 }), new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),],
+  //       fileIsRequired: false, // <-- Cho phép file optional
+  //     })
+  //   ) file?: Express.Multer.File,
+  // ) {
+  //   if (file) {
+  //     // console.log(file)
+  //     const base64 = file.buffer.toString('base64');
+
+  //     const formData = new URLSearchParams();
+  //     formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
+  //     formData.append('image', base64);
+
+  //     const res = await axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
+  //       headers: {
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //     });
+  //     const imageUrl = res.data.data.url;
+  //     createUserDto.avatar_url = imageUrl;
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
@@ -32,17 +58,19 @@ export class CategoryController {
       formData.append('key', process.env.IMGBB_AVATAR_API_KEY || '');
       formData.append('image', base64);
 
-      const res = await axios.post(
-        'https://api.imgbb.com/1/upload',
-        formData.toString(),
-        {
+      let imageUrl = '';
+      try {
+        const res = await axios.post('https://api.imgbb.com/1/upload', formData.toString(), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        },
-      );
+        });
+        imageUrl = res.data.data.url;
+      } catch (error) {
+        console.log("error", error.message)
+        throw new BadRequestException('Failed to upload image');
+      }
 
-      const imageUrl = res.data.data.url;
       createCategoryDto.image_url = imageUrl;
     }
 

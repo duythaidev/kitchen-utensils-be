@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -12,6 +12,8 @@ export class ProductsController {
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
+  
+  @UsePipes(new ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } }))
   @Get()
   async getByFilter(@Query() query: FilterProductDto) {
     return this.productsService.getFilteredProducts(query);
