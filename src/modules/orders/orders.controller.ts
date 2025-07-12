@@ -7,7 +7,7 @@ import { FilterOrderDto } from './dto/filter-order.dto';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
@@ -20,7 +20,7 @@ export class OrdersController {
   }
 
 
-  @UseGuards(JwtAuthGuard)
+
   @Get('me')
   findUserOrdersHistory(@Req() req: any) {
     console.log("req.user", req.user)
@@ -38,7 +38,7 @@ export class OrdersController {
     return this.ordersService.update(+id, updateOrderDto);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  // 
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.updateStatus(+id, updateOrderDto.status);

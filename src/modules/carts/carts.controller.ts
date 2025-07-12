@@ -13,7 +13,7 @@ export class CartsController {
   //   return this.cartsService.create(user_id);
   // }
 
-  @UseGuards(JwtAuthGuard)
+
   @Post()
   addToCart(@Body() updateCartDto: UpdateCartDto, @Req() req: any) {
     console.log(updateCartDto, 'req.user', req.user)
@@ -26,14 +26,14 @@ export class CartsController {
   }
 
 
-  // @UseGuards(JwtAuthGuard)
+  // 
   // @Get() 
   // getCart(@Req() req: any) {
   //   console.log(req.user)
   //   return this.cartsService.getProducstInCart(req.user.id);
   // }
 
-  @UseGuards(JwtAuthGuard)
+
   @Get('me')
   getCartMe(@Req() req: any) {
     return this.cartsService.getProducstInCart(req.user.id);
@@ -49,7 +49,6 @@ export class CartsController {
   //   return this.cartsService.getProducstInCart(+user_id);
   // }
 
-  @UseGuards(JwtAuthGuard)
   @Delete()
   remove(@Body() body: { product_id: number }, @Req() req: any) {
     console.log(body, 'body', req.user.id)
@@ -57,13 +56,12 @@ export class CartsController {
     return this.cartsService.removeFromCart(body.product_id, req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Put()
   updateQuantity(@Body() body: { product_id: number, quantity: number }, @Req() req: any) {
     return this.cartsService.updateQuantity(body.product_id, body.quantity, req.user.id);
-  } 
+  }
 
-  @UseGuards(JwtAuthGuard)
+
   @Post('checkout')
   async checkout(@Body() body: { address: string }, @Req() req: any) {
     const { address } = body;

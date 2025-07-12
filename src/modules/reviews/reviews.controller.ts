@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) { }
 
-  @UseGuards(JwtAuthGuard)
+
   @Post()
   create(@Body() createReviewDto: CreateReviewDto, @Req() req: any) {
     console.log(createReviewDto, req.user.id)
@@ -29,7 +29,7 @@ export class ReviewsController {
   // update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
   //   return this.reviewsService.update(+id, updateReviewDto);
   // }
-  @UseGuards(JwtAuthGuard)
+
   @Delete()
   deleteReview(@Body() body: { product_id: number }, @Req() req: any) {
     if (typeof body.product_id !== 'number') {

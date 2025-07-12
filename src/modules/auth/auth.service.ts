@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email, true);
     if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;
@@ -47,12 +47,27 @@ export class AuthService {
       throw new BadRequestException('Email already in use');
     }
 
+    // hash password before saving
+    const hashedPassword = await this.hashPassword(createUserDto.password);
+    createUserDto.password = hashedPassword;
+
     return this.usersService.create({ ...createUserDto, auth_provider: "local" });
   }
 
   async findOrCreateByGoogle(createUserGoogleDto: CreateUserGoogleDto) {
     const user = await this.usersService.findByEmail(createUserGoogleDto.email);
     if (user) return user;
-    return this.usersService.create({ email: createUserGoogleDto.email, avatar_url: createUserGoogleDto.avatar_url, user_name: createUserGoogleDto.user_name, password: "", auth_provider: "google" });
+    return this.usersService.create({
+      email: createUserGoogleDto.email,
+      avatar_url: createUserGoogleDto.avatar_url,
+      user_name: createUserGoogleDto.user_name,
+      password: "",
+      auth_provider: "google"
+    });
+  }
+
+  async hashPassword(password: string) {
+    // return bcrypt.hash(password, 10);
+    return password;
   }
 }

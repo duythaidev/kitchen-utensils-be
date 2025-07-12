@@ -85,8 +85,13 @@ export class UsersService {
     });
     return user
   }
-  async findByEmail(email: string) {
-    return await this.usersRepository.findOne({ where: { email }, select: this.select });
+  async findByEmail(email: string, password: boolean = false) {
+    return await this.usersRepository.findOne({
+      where: { email },
+      select: password ? // If password is true, include password in the select
+        this.select :
+        { ...this.select, password: true }
+    });
   }
 
   async findByAuthProvider(auth_provider: string) {

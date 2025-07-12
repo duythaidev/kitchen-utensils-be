@@ -50,14 +50,14 @@ export class UsersController {
 
   // hoac dung @UseGuards('jwt_strategy') 
   // UseGuards se tim strategy ten la jwt_strategy tro thanh 1 strategy nhan request
-  @UseGuards(JwtAuthGuard)
+
   @Get('me')
   getProfile(@Req() req: any) {
     console.log("req.user", req.user)
     return this.usersService.findByEmail(req.user.email);
   }
 
-  @UseGuards(JwtAuthGuard)
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     console.log(id)

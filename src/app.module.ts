@@ -16,6 +16,9 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { OrderDetailsModule } from './modules/order-details/order-details.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { StatisticModule } from './modules/statistic/statistic.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './modules/auth/guards/roles.guard';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,9 +37,21 @@ import { StatisticModule } from './modules/statistic/statistic.module';
     ReviewsModule,
     ProductImagesModule,
     StatisticModule,
+
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, // allow role guard inject other services
+    },
+    
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+
+  ],
 })
 
 export class AppModule {
