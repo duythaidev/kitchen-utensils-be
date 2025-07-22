@@ -5,6 +5,7 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 import axios from 'axios';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { UpdateProductImageDto } from './dto/update-product-image.dto';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('product-images')
 export class ProductImagesController {
@@ -54,16 +55,20 @@ export class ProductImagesController {
         // await Promise.all(chainCreate);
 
     }
+
+    @Public()
     @Get()
     findAll() {
         return this.productImagesService.findAll();
     }
 
+    @Public()
     @Get('product/:productId')
     findByProductId(@Param('productId') productId: string) {
         return this.productImagesService.findByProductId(+productId);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.productImagesService.findOne(+id);
@@ -104,11 +109,11 @@ export class ProductImagesController {
             const responses = await Promise.all(chainPromise);
             const imageUrls = responses.map(res => res.data.data.url);
 
-            const result = await this.productImagesService.update( +id, +updateProductImageDto.isMain, imageUrls );
+            const result = await this.productImagesService.update(+id, +updateProductImageDto.isMain, imageUrls);
 
             return result;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             throw new BadRequestException('Error updating product images');
         }
     }

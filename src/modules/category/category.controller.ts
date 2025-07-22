@@ -5,6 +5,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { FilterCategoryDto } from './dto/filter-category.dto';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('categories')
 export class CategoryController {
@@ -76,7 +77,8 @@ export class CategoryController {
 
     return this.categoryService.create(createCategoryDto);
   }
-
+  
+  @Public()
   @Get()
   findAll(@Query() filterDto: FilterCategoryDto) {
     return this.categoryService.getFilteredCategories(filterDto);
@@ -87,6 +89,7 @@ export class CategoryController {
   //   return this.categoryService.findAll();
   // }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(+id);

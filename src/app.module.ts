@@ -43,14 +43,12 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
   providers: [AppService,
     {
       provide: APP_GUARD,
-      useClass: RolesGuard, // allow role guard inject other services
-    },
-    
+      useClass: RolesGuard, 
+    },    
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-
   ],
 })
 

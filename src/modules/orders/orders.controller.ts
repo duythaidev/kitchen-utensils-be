@@ -23,7 +23,6 @@ export class OrdersController {
 
   @Get('me')
   findUserOrdersHistory(@Req() req: any) {
-    console.log("req.user", req.user)
     return this.ordersService.findUserOrdersHistory(req.user.id);
   }
 

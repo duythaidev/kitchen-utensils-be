@@ -51,28 +51,31 @@ export class ProductsService {
       .createQueryBuilder("product")
       .leftJoinAndSelect("product.category", "category")
       .leftJoinAndSelect("product.images", "images")
-      .addSelect("COALESCE(product.discounted_price, product.price)", "effective_price") 
+      .leftJoinAndSelect("product.reviews", "reviews")
+      .addSelect("COALESCE(product.discounted_price, product.price)", "effective_price")
 
     if (keyword) {
       qb.andWhere("LOWER(product.product_name) LIKE :keyword", { keyword: `%${keyword.toLowerCase()}%` })
     }
 
-    if (priceFrom !== 0 && priceTo !== 0) {
-      qb.andWhere("COALESCE(product.discounted_price, product.price) BETWEEN :from AND :to", {
-        from: priceFrom,
-        to: priceTo,
-      })
-    } else if (priceFrom !== 0) {
-      qb.andWhere("COALESCE(product.discounted_price, product.price) >= :from", { from: priceFrom })
-    } else if (priceTo !== 0) {
-      qb.andWhere("COALESCE(product.discounted_price, product.price) <= :to", { to: priceTo })
+    if (priceFrom && priceTo) {
+      if (priceFrom !== 0 && priceTo !== 0) {
+        qb.andWhere("COALESCE(product.discounted_price, product.price) BETWEEN :from AND :to", {
+          from: priceFrom,
+          to: priceTo,
+        })
+      } else if (priceFrom !== 0) {
+        qb.andWhere("COALESCE(product.discounted_price, product.price) >= :from", { from: priceFrom })
+      } else if (priceTo !== 0) {
+        qb.andWhere("COALESCE(product.discounted_price, product.price) <= :to", { to: priceTo })
+      }
     }
 
     if (categoryId) {
       qb.andWhere("category.id = :category", { category: categoryId })
     }
 
-    // console.log("priceSort", priceSort)
+    // // console.log("priceSort", priceSort)
     if (sort === "newest") {
       qb.orderBy("product.created_at", "DESC")
     }
@@ -88,7 +91,15 @@ export class ProductsService {
       .take(limitNumber)
       .getManyAndCount()
 
+    const reviews = items.map(item => {
+      const totalReviews = item.reviews.length
+      const averageRating = totalReviews > 0 ? item.reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews : 0
 
+      return {
+        totalReviews,
+        averageRating
+      }
+    })
 
     return {
       data: items,
@@ -118,7 +129,8 @@ export class ProductsService {
       },
       relations: {
         category: true,
-        images: true // one to many
+        images: true, // one to many
+        reviews: true, // one to many
       },
     })
   }

@@ -16,7 +16,7 @@ export class CartsController {
 
   @Post()
   addToCart(@Body() updateCartDto: UpdateCartDto, @Req() req: any) {
-    console.log(updateCartDto, 'req.user', req.user)
+    // console.log(updateCartDto, 'req.user', req.user)
     return this.cartsService.addToCart(updateCartDto, req.user.id);
   }
 
@@ -32,7 +32,6 @@ export class CartsController {
   //   console.log(req.user)
   //   return this.cartsService.getProducstInCart(req.user.id);
   // }
-
 
   @Get('me')
   getCartMe(@Req() req: any) {
@@ -51,7 +50,7 @@ export class CartsController {
 
   @Delete()
   remove(@Body() body: { product_id: number }, @Req() req: any) {
-    console.log(body, 'body', req.user.id)
+    // console.log(body, 'body', req.user.id)
 
     return this.cartsService.removeFromCart(body.product_id, req.user.id);
   }

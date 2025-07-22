@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FilterUserDto } from './dto/filter-user.dto';
+import { ChangePasswordDto } from './dto/changePassword.dto';
 require('dotenv').config()
 @Controller('users')
 export class UsersController {
@@ -53,7 +54,6 @@ export class UsersController {
 
   @Get('me')
   getProfile(@Req() req: any) {
-    console.log("req.user", req.user)
     return this.usersService.findByEmail(req.user.email);
   }
 
@@ -96,6 +96,13 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto,);
   }
 
+  @Patch('change-password/')
+  changePassword(@Param('id') id: string, @Body() changePasswordDto: ChangePasswordDto) {
+    if (changePasswordDto.newPassword !== changePasswordDto.confirmNewPassword) {
+      throw new BadRequestException('New password and confirm password do not match');
+    }
+    return this.usersService.changePassword(+id, changePasswordDto);
+  }
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

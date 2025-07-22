@@ -5,6 +5,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateUserGoogleDto } from '../users/dto/create-user-google.dto';
 // user local passport dang nhap tra ve jwt token
 // jwt passport dung de validate token
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -13,20 +14,6 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
-  // async signIn(email: string, pass: string): Promise<any> {
-  //   const user = await this.usersService.findByEmail(email);
-  //   if (user?.password !== pass) {
-  //     throw new UnauthorizedException({ message: 'Email or password is incorrect' });
-  //   }
-  //   const payload = { id: user.id, email: user.email };
-  //   return {
-  //     access_token: await this.jwtService.signAsync(payload),
-  //     user: {
-  //       id: user.id,
-  //       user_name: user.user_name
-  //     }
-  //   };
-  // }
   async signJWT(user: any) {
     const payload = { email: user.email, sub: user.id };
     return this.jwtService.sign(payload);
@@ -67,7 +54,6 @@ export class AuthService {
   }
 
   async hashPassword(password: string) {
-    // return bcrypt.hash(password, 10);
-    return password;
+    return bcrypt.hash(password, 10);
   }
 }

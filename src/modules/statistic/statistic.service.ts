@@ -26,7 +26,7 @@ export class StatisticService {
             },
         });
         
-        console.log(ordersIn2Month, newUsersIn2Month);
+        // console.log(ordersIn2Month, newUsersIn2Month);
         // so luong don hang trong 2 thang
         const ordersThisMonth = ordersIn2Month.filter((order) => order.created_at > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
         const ordersLastMonth = ordersIn2Month.filter((order) => order.created_at < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));

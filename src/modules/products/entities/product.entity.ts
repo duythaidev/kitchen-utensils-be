@@ -1,5 +1,6 @@
 import { Category } from "src/modules/category/entities/category.entity";
 import { ProductImage } from "src/modules/product-images/entities/product-image.entity";
+import { Review } from "src/modules/reviews/entities/review.entity";
 import { PrimaryGeneratedColumn, Column, ManyToOne, Entity, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToMany } from "typeorm";
 
 @Entity()
@@ -34,6 +35,9 @@ export class Product {
     // relation
     @OneToMany(() => ProductImage, productImage => productImage.product)
     images: ProductImage[];
+
+    @OneToMany(() => Review, review => review.product)
+    reviews: Review[];
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     public created_at: Date;

@@ -54,7 +54,7 @@ export class CartsService {
 
   async getProducstInCart(user_id: number) {
     let cart = await this.findOne(user_id);
-    console.log("cart", cart)
+    // console.log("cart", cart)
     // Ko thay thi tao
     if (!cart) {
       cart = await this.create(user_id)

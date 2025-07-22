@@ -23,7 +23,7 @@ export class Review {
     user: User;
 
     @Column()
-    product_id: number;
+    product_id: number
 
     @ManyToOne(() => Product)
     @JoinColumn({ name: 'product_id' })

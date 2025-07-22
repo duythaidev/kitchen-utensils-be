@@ -3,6 +3,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('products')
 export class ProductsController {
@@ -12,20 +13,23 @@ export class ProductsController {
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
-  
+
+  @Public()
   @UsePipes(new ValidationPipe({ transform: true, transformOptions: { enableImplicitConversion: true } }))
   @Get()
   async getByFilter(@Query() query: FilterProductDto) {
+    // console.log(query)
     return this.productsService.getFilteredProducts(query);
   }
 
-  
+
 
   // @Get()
   // findAll() {
   //   return this.productsService.findAll();
   // }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
