@@ -9,6 +9,12 @@ import { Public } from 'src/decorators/public.decorator';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
+  @Public()
+  @Get('top-rated')
+  getTopRatedProducts() {
+    return this.productsService.getTopRatedProducts();
+  }
+  
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
@@ -44,4 +50,6 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id);
   }
+
+
 }

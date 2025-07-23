@@ -181,4 +181,16 @@ export class ProductsService {
   remove(id: number) {
     return this.productsRepository.delete(id)
   }
+
+  async getTopRatedProducts() {
+    const products = await this.productsRepository.find({
+      relations: {
+        reviews: true,
+        images: true,
+      },
+    })
+    const topRatedProducts = products.sort((a, b) => b.reviews.reduce((sum, review) => sum + review.rating, 0) / b.reviews.length - a.reviews.reduce((sum, review) => sum + review.rating, 0) / a.reviews.length).slice(0, 5)
+    // console.log(topRatedProducts)
+    return topRatedProducts
+  }
 }
