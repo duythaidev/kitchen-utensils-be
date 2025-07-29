@@ -8,11 +8,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FilterUserDto } from './dto/filter-user.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 require('dotenv').config()
+import { Roles, UserRole } from 'src/decorators/roles.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post()
+  @Roles(UserRole.Admin)
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
     @Body() createUserDto: CreateUserDto,
@@ -44,6 +46,7 @@ export class UsersController {
 
 
   @Get()
+  @Roles(UserRole.Admin)
   findAll(@Query() filterDto: FilterUserDto) {
     return this.usersService.getFilteredUsers(filterDto);
   }
@@ -59,6 +62,7 @@ export class UsersController {
 
 
   @Get(':id')
+  @Roles(UserRole.Admin)
   findOne(@Param('id') id: string) {
     console.log(id)
     return this.usersService.findOne(+id);
@@ -66,6 +70,7 @@ export class UsersController {
 
 
   @Patch(':id')
+  @Roles(UserRole.Admin)
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Param('id') id: string,
@@ -97,23 +102,28 @@ export class UsersController {
   }
 
   @Patch('change-password/')
+  @Roles(UserRole.Admin)
   changePassword(@Param('id') id: string, @Body() changePasswordDto: ChangePasswordDto) {
     if (changePasswordDto.newPassword !== changePasswordDto.confirmNewPassword) {
       throw new BadRequestException('New password and confirm password do not match');
     }
     return this.usersService.changePassword(+id, changePasswordDto);
   }
+
   @Delete(':id')
+  @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
 
   @Post('ban/:id')
+  @Roles(UserRole.Admin)
   ban(@Param('id') id: string) {
     return this.usersService.ban(+id, false);
   }
 
   @Post('unban/:id')
+  @Roles(UserRole.Admin)
   unban(@Param('id') id: string) {
     return this.usersService.ban(+id, true);
   }

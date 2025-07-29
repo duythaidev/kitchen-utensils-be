@@ -12,7 +12,7 @@ export class ProductImagesService {
     ) { }
 
     async create(product_id: number, isMain: number, listImageUrl: string[]) {
-        console.log("service: ", product_id, isMain, listImageUrl)
+        // console.log("service: ", product_id, isMain, listImageUrl)
         const productImages = listImageUrl.map((imageUrl, index) => {
             return this.productImageRepository.create({
                 product_id,
@@ -22,7 +22,7 @@ export class ProductImagesService {
             });
         });
         const productImagesEntities = this.productImageRepository.create(productImages);
-        console.log("service: ", productImagesEntities)
+        // console.log("service: ", productImagesEntities)
         return await this.productImageRepository.insert(productImagesEntities);
     }
 
@@ -47,7 +47,7 @@ export class ProductImagesService {
     }
 
     async update(product_id: number, isMain: number, listImageUrl: string[]) {
-        console.log("service: ", product_id, isMain, listImageUrl)
+        // console.log("service: ", product_id, isMain, listImageUrl)
         
         const isExist = await this.findByProductId(product_id);
 

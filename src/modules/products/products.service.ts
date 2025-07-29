@@ -40,7 +40,7 @@ export class ProductsService {
 
     // class already parse pricefrom , priceto to 0
     const { keyword, sort, priceSort, priceFrom, priceTo, categoryId, page, limit } = query
-    console.log(query)
+    // console.log(query)
     const pageNumber = page ? page : 1
     const limitNumber = limit ? limit : 6
 

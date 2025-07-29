@@ -4,7 +4,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FilterOrderDto } from './dto/filter-order.dto';
-
+import { Roles, UserRole } from 'src/decorators/roles.decorator';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
@@ -15,6 +15,7 @@ export class OrdersController {
   }
 
   @Get()
+  @Roles(UserRole.Admin)
   findAll(@Query() filterDto: FilterOrderDto) {
     return this.ordersService.getFilteredOrders(filterDto);
   }

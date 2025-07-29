@@ -31,9 +31,9 @@ export class CartDetailsService {
       }
     });
     // console.log(cartItems.forEach(item => console.log(item.)));
-    console.log('>>> cartItems', cartItems)
+    // console.log('>>> cartItems', cartItems)
     const total_price = cartItems?.reduce((total, item) => total + (item.product?.discounted_price || item.product?.price) * item.quantity, 0);
-    console.log('>>> total_price', total_price)
+    // console.log('>>> total_price', total_price)
     const createOrderDto: CreateOrderDto = {
       address,
       total_price,

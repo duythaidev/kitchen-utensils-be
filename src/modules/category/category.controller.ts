@@ -6,6 +6,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import { FilterCategoryDto } from './dto/filter-category.dto';
 import { Public } from 'src/decorators/public.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/decorators/roles.decorator';
 
 @Controller('categories')
 export class CategoryController {
@@ -38,6 +40,7 @@ export class CategoryController {
   //     createUserDto.avatar_url = imageUrl;
 
   @Post()
+  @Roles(UserRole.Admin)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -96,6 +99,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.Admin)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
@@ -136,6 +140,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.categoryService.remove(+id);
   }

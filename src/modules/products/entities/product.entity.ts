@@ -33,13 +33,13 @@ export class Product {
     
 
     // relation
-    @OneToMany(() => ProductImage, productImage => productImage.product)
+    @OneToMany(() => ProductImage, productImage => productImage.product, { cascade: ['remove'], onDelete: 'CASCADE' })
     images: ProductImage[];
 
-    @OneToMany(() => Review, review => review.product)
+    @OneToMany(() => Review, review => review.product, { cascade: ['remove'], onDelete: 'CASCADE' })
     reviews: Review[];
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" }) 
     public created_at: Date;
 
     @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })

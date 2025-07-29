@@ -6,11 +6,14 @@ import axios from 'axios';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { UpdateProductImageDto } from './dto/update-product-image.dto';
 import { Public } from 'src/decorators/public.decorator';
+import { UserRole } from 'src/decorators/roles.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('product-images')
 export class ProductImagesController {
     constructor(private readonly productImagesService: ProductImagesService) { }
 
+    @Roles(UserRole.Admin)
     @Post()
     @UseInterceptors(FilesInterceptor('product-images'))
     async create(
@@ -20,7 +23,7 @@ export class ProductImagesController {
         )
 
         files: Express.Multer.File[]) {
-        console.log(files);
+        // console.log(files);
         if (files.length > 3) {
             throw new BadRequestException('Product images should only have max of 3 images');
         }
@@ -44,7 +47,7 @@ export class ProductImagesController {
                 const imageUrl = item.data.data.url;
                 return imageUrl;
             }));
-            console.log("controller", listImageUrl)
+            // console.log("controller", listImageUrl)
             const res = await this.productImagesService.create(createProductImageDto.product_id, createProductImageDto.isMain, listImageUrl);
             // console.log("controller", res)
             return res;
@@ -74,6 +77,7 @@ export class ProductImagesController {
         return this.productImagesService.findOne(+id);
     }
 
+    @Roles(UserRole.Admin)
     @Patch(':id')
     @UseInterceptors(FilesInterceptor('product-images'))
     async update(
@@ -120,6 +124,7 @@ export class ProductImagesController {
 
 
     @Delete(':id')
+    @Roles(UserRole.Admin)
     remove(@Param('id') id: string) {
         return this.productImagesService.remove(+id);
     }
